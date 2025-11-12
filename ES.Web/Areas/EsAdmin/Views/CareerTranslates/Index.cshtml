@@ -1,0 +1,94 @@
+﻿@model CareerTranslateViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@section Styles {
+    <link href="~/CMS/css/translationindex.css" rel="stylesheet" />
+}
+
+@{
+    ViewData["Title"] = @Localizer["Career Translations"];
+}
+
+<div id="translations-section" class="container py-4">
+
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-bold d-flex align-items-center">
+            <img src="~/CMS/assets/images/icons/translate.png"
+                 alt="Translations Icon"
+                 class="me-2 img-fluid"
+                 style="width: 32px; height: auto; max-width: 100%;">
+            @Localizer["Translations"]
+        </h5>
+        @if (Model.PreEnteredTranslations?.Count() < 1)
+        {
+            <a asp-action="Create" asp-route-careerId="@Model.CareerId" class="btn btn-success d-flex align-items-center">
+                <i class="lni lni-plus me-2" style="font-size: 1.2rem;"></i>
+                @Localizer["Add Translation"]
+            </a>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table">
+            <thead>
+                <tr>
+                    <th>@Localizer["Job Name"]</th>
+                    <th>@Localizer["Language"]</th>
+                    <th>@Localizer["Creation date"]</th>
+                    <th>@Localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold">@Model.CareerName</td>
+                    <td class="text-muted">@Localizer[Model.CareerDefaultLang!] / @Localizer["default language"]</td>
+                    <td>@Model.CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <a asp-controller="Careers" asp-action="Edit" asp-route-CareerId="@Model.CareerId" class="me-2" title="@Localizer["Edit"]">
+                            <ion-icon class="lni lni-pencil hover-scale text-primary"></ion-icon>
+                        </a>
+                        <a asp-controller="Careers" asp-action="Edit" asp-route-CareerId="@Model.CareerId" class="me-2" title="@Localizer["View"]">
+                            <ion-icon class="lni lni-eye hover-scale text-success" style="background: none;"></ion-icon>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model.PreEnteredTranslations is not null)
+                {
+                    @foreach (var translation in Model.PreEnteredTranslations)
+                    {
+                        <tr>
+                            <td>@translation.JobTitle</td>
+                            <td>@Localizer[@translation.Language!.Code]</td>
+                            <td>@translation.CreatedAt.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a asp-controller="CareerTranslates" asp-action="Edit" asp-route-careerId="@Model.CareerId" asp-route-Translateid="@translation.Id" class="me-2" title="@Localizer["Edit"]">
+                                    <ion-icon class="lni lni-pencil hover-scale text-primary"></ion-icon>
+                                </a>
+                                <a asp-controller="CareerTranslates" asp-action="Edit" asp-route-careerId="@Model.CareerId" asp-route-Translateid="@translation.Id" class="me-2" title="@Localizer["View"]">
+                                    <ion-icon class="lni lni-eye hover-scale text-success"></ion-icon>
+                                </a>
+                                <a href="javascript:;" onclick="deleteTranslation('@translation.Id','@Model.CareerId', this)" class="me-2" title="@Localizer["Delete"]">
+                                    <ion-icon class="lni lni-trash hover-scale text-danger"></ion-icon>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // Set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script src="~/CMS/js/CareerTranslates.js"></script>
+}

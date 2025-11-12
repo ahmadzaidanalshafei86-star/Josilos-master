@@ -1,0 +1,380 @@
+﻿@media (max-width: 1800px) {
+
+.multi2-item-carousel {
+    height: 22vw;
+}
+}
+
+@media (max-width: 1200px) {
+
+.container-fluid
+{
+	padding-right: 15px;
+	padding-left: 15px;
+}
+.top {
+     font-size:13px;
+     text-align:center;
+}
+
+.top a 
+{
+    color: #fff;
+    margin-right: 7px;
+}
+
+.top .socials {
+    text-align: center;
+}
+
+.top .socials ul {
+    text-align: center;
+}
+
+
+.icons ul li {
+    width: 105px;
+}
+
+
+#cssmenu > ul > li > a 
+{
+        padding: 37px 5px;
+        font-size: 14px;
+}
+
+.code_apply {
+    width: 215px;
+}
+.news ul li {
+    display: inline-block;
+    width: 240px;
+}
+
+
+/*-------new css--------*/
+.news ul li .text-inner 
+{
+    height: 80px;
+}	
+
+
+}
+
+@media (max-width: 991px) {
+.carousel {
+    margin-top:10px;
+    margin-bottom:10px;
+}
+.caption-inner {
+    margin-top:10px;
+    margin-bottom:10px;
+	}	
+.news ul li {
+        width: 30%;
+        margin: 20px 10px;
+}
+
+.news ul li .text-inner {
+    height: 80px;
+}	
+
+.code_apply {
+    width: 300px;
+}
+
+.header {
+    padding: 10px 0;
+}
+
+
+
+.logo img 
+{
+    margin: 0;
+    width: 168px;
+    object-fit: contain;
+}
+.logo2 {
+     padding-top: 0px;
+}
+
+
+.search-icon {
+    top: 20px;
+
+}
+.search-input-wrapper {
+    top: 85px;
+}
+
+
+#cssmenu > ul > li > a {
+        padding: 20px 2px;
+        font-size: 12px;
+}
+
+.main-wrap {
+    position: absolute;
+    display: inline-block;
+    flex-direction: column;
+    align-items: center;
+    color: #FFFFFF;
+    left: 81px;
+    top: -70px;
+}
+
+.top {
+    font-size: 12px;
+    text-align: center;
+}  
+	
+	
+.top a {
+    margin-left: 3px;
+    margin-right: 4px;
+}
+
+
+.top i {
+    font-size: 13px;
+    margin-left: 2px;
+}
+.top ul {
+    text-align: center;
+}
+.top ul li {
+    display: inline-block;
+    padding-left: 5px;margin-left: 5px;
+}
+.top .socials ul {
+    text-align: center;
+}
+.top .socials ul li a i {
+    margin-right: 0;
+    font-size: 13px;
+    margin-left: 0px;
+}
+
+
+.icons
+{
+	 display:none;
+}
+
+.icons {
+    position: relative;
+    bottom: auto;
+    width: 100%;
+}
+
+.icons ul li {
+    display: inline-block;
+    width: 33%;
+    height: 100px;        
+	margin-bottom: 3px;
+}
+
+.icons-mobile {
+    display: block !important;
+}
+
+
+
+}
+
+@media (max-width: 768px) {
+.logo img {
+        margin: 0;
+        width: 168px;
+        object-fit: contain;
+}
+.logo2 {
+        position: absolute;
+        left: 200px;
+        top: 10px;
+}
+	
+	.logo2 img {
+    height: 45px;
+    object-fit: contain;
+}
+.search-icon {
+        top: 10px;
+        position: absolute;
+        right: 75px;
+        left: auto;
+        padding: 13px 16px;
+}
+.search-input-wrapper {
+    top: 93px;
+}
+	
+
+
+
+}
+
+
+
+@media (max-width: 767px) {
+
+
+.code_apply {
+    display: block;
+    padding: 12px 20px;
+    margin: 0px 0px 10px 20px;
+    min-height: 50px;
+    color: #fff;
+    width: 100%;
+    float: right;
+}
+
+
+.icons-mobile 
+{
+    display: block;
+    bottom: auto;
+}
+
+.icons ul li {
+    display: inline-block;
+    width:32.7%;
+    height: 100px;
+}
+
+.welcome {
+    padding: 50px 0 ;
+}
+
+.servics-box-small {
+    margin: 0px 0px;
+    width:100%;
+}
+
+.news ul li {
+    width: 100%;    
+    margin: 0px 0px 20px 0;
+}
+
+.news ul li .text-inner {
+    height: 45px;
+}
+.title {
+    color: #032241;
+    text-align: right;
+}
+
+
+#amazingcarousel-1 .amazingcarousel-prev {
+    left: 0%;
+    top: 50%;
+    margin-left: -20px;
+    margin-top: -35px;
+}
+#amazingcarousel-1 .amazingcarousel-next {
+    right: 0%;
+    top: 50%;
+    margin-right: -20px;
+    margin-top: -35px;
+}
+
+
+/*-------new css--------*/
+.news ul li img {
+    margin: auto;
+    height: 280px;
+}
+	
+
+}
+
+
+
+@media (max-width: 480px) {
+.top 
+{
+    font-size: 12px;
+    text-align: center;
+    line-height: 25px;        
+	padding: 5px 0;
+
+}	
+.language a {
+    font-size: 12px !important;
+}	
+.logo img 
+{
+        margin: 0;
+        width: 125px;
+        object-fit: contain;
+}
+.logo2 
+{
+        left: 150px;
+}
+	
+.logo2 img {
+    height: 45px;
+    object-fit: contain;
+}	
+
+#cssmenu #menu-button {
+        top: -43px;
+}	
+	
+	
+/*-------new css--------*/
+.news ul li img {
+    margin: auto;
+    height: 280px;
+}
+	
+.search-input-wrapper {
+    top: 80px;
+}
+.search-input {
+    width: 100%;
+}
+
+.search-input input {
+    width: 85%;
+}
+
+
+.box-style2-new {
+    height: 155px;
+    width: 155px;
+}
+	
+.title {
+        font-size: 16px;
+        margin-top: 28px;
+}
+
+
+.employee-box {
+    width: 100%;
+}
+.employee-box img {
+    width: 100%;
+}
+
+.ribbon {
+    width: 100%;
+    color: white;
+    text-align: center;
+    padding-top: 20px;
+    text-transform: capitalize;
+    font-size: 18px;
+    height: 114px;
+    background: url(../images/ribbon.png) no-repeat scroll center top;
+    background-size: contain;
+    position: absolute;
+    bottom: -55px;
+    left: 0px;
+    right: 0;
+    margin: auto;
+}
+
+}

@@ -1,0 +1,297 @@
+﻿@model TenderFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Tender"];
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/CMS/lib/dropzone/dropzone.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @((Model.Id > 0)
+                                                ? Localizer["Edit tender"]
+                                                : Localizer["Add tender"])
+                    </h6>
+                    <hr>
+
+                    <form id="tenderForm" method="post" enctype="multipart/form-data" asp-controller="Tenders">
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+
+                        <div class="row g-3">
+                            <!-- Title -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Tender title"]<span class="text-danger">*</span></label>
+                                <input asp-for="Title" class="form-control" required />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+
+                            <!-- Code -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Tender code"]<span class="text-danger">*</span></label>
+                                <input asp-for="Code" class="form-control" required />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+
+                            <!-- Copy Price -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Copy price"]<span class="text-danger">*</span></label>
+                                <input asp-for="CopyPrice" class="form-control" required />
+                                <span asp-validation-for="CopyPrice" class="text-danger"></span>
+                            </div>
+
+                            <!-- Dates -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Start date"]<span class="text-danger">*</span></label>
+                                <input asp-for="StartDate" type="date" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["End date"]<span class="text-danger">*</span></label>
+                                <input asp-for="EndDate" type="date" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Envelope opening date"]</label>
+                                <input asp-for="EnvelopeOpeningDate" type="date" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Last copy purchase date"]</label>
+                                <input asp-for="LastCopyPurchaseDate" type="date" class="form-control" />
+                            </div>
+
+                            <!-- Details -->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Details"]</label>
+                                <textarea id="tinyMCEDetails" asp-for="Details" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="Details" class="text-danger"></span>
+                            </div>
+
+                            <!-- Prices Offered -->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Prices offered"]</label>
+                                <textarea id="tinyMCEPricesOffered" asp-for="PricesOffered" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="PricesOffered" class="text-danger"></span>
+                            </div>
+
+                            <!-- Meta Description / Keywords -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Description"]</label>
+                                <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Keywords"]</label>
+                                <textarea asp-for="MetaKeywords" class="form-control" rows="2"></textarea>
+                            </div>
+
+                            <!-- Tender Materials (Multi-Select) -->
+
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Tender Materials"]</label>
+                                <select asp-for="SelectedMaterialIds"
+                                        asp-items="Model.Materials"
+                                        class="form-select"
+                                        multiple="multiple"
+                                        id="tenderMaterialsSelect">
+                                </select>
+                                <span asp-validation-for="SelectedMaterialIds" class="text-danger"></span>
+                            </div>
+
+                          @*   <div class="col-md-12">
+                                <label class="form-label">@Localizer["Tender Materials"]</label>
+                                <select asp-for="SelectedMaterialIds" asp-items="Model.Materials" class="form-select" multiple="multiple" id="tenderMaterialsSelect">
+                                </select>
+                                <span asp-validation-for="SelectedMaterialIds" class="text-danger"></span>
+                            </div>
+ *@
+                            <!-- Tender Image -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Tender image"]</label>
+                                <input asp-for="TenderImage" type="file" class="form-control"
+                                       accept="image/jpeg, image/png, image/webp"
+                                       onchange="previewImage(event, 'TenderImagePreview')" />
+                                <div class="text-center mt-2">
+                                    <img id="TenderImagePreview"
+                                         src="@(!string.IsNullOrEmpty(Model.TenderImageUrl) ? Url.Content($"~/images/Tenders/{Model.TenderImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                         class="img-fluid rounded shadow"
+                                         style="max-width: 100%; max-height: 250px; object-fit: cover;" />
+                                </div>
+                                <input type="hidden" asp-for="TenderImageUrl" />
+                            </div>
+
+                            <!-- Attachments -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Tender files (documents)"]</label>
+                                <div id="tenderFilesDropzone" class="dropzone">
+                                    <div id="sortableTenderFiles"></div>
+                                </div>
+                            </div>
+
+                            <!-- Other Attachments -->
+                            <div class="col-md-12 mt-4">
+                                <h6 class="text-uppercase">@Localizer["Other attachments"]</h6>
+                                <hr class="mt-1 mb-3">
+
+                                <div id="otherAttachmentsContainer">
+                                    @if (Model.TenderOtherAttachments != null && Model.TenderOtherAttachments.Any())
+                                    {
+                                        for (int i = 0; i < Model.TenderOtherAttachments.Count; i++)
+                                        {
+                                            <div class="row g-2 mb-2 other-attachment-item">
+                                                <div class="col-md-5">
+                                                    <input type="text" name="TenderOtherAttachments[@i].Name" value="@Model.TenderOtherAttachments[i].Name"
+                                                           class="form-control" placeholder="@Localizer["Attachment name"]" required />
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <input type="file" name="TenderOtherAttachments[@i].File"
+                                                           class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" />
+                                                </div>
+                                                <div class="col-md-2 text-end">
+                                                    <button type="button" class="btn btn-danger remove-attachment w-100">@Localizer["Remove"]</button>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+
+                                <button type="button" id="addAttachmentBtn" class="btn btn-outline-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> @Localizer["Add another attachment"]
+                                </button>
+                            </div>
+
+                            <!-- Flags / Blink -->
+                            <div class="col-lg-12 mt-3">
+                                <div class="form-check">
+                                    <input asp-for="Publish" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish tender?"]</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input asp-for="PublishPricesOffered" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish prices offered?"]</label>
+                                </div>
+
+                                <div class="form-check">
+                                    <input asp-for="SpecialOfferBlink" class="form-check-input" type="checkbox" id="SpecialOfferBlinkToggle" />
+                                    <label class="form-check-label" for="SpecialOfferBlinkToggle">
+                                        @Localizer["Enable special offer blink?"]
+                                    </label>
+                                </div>
+
+                                <!-- Blink Dates -->
+                                <div id="blinkDatesSection" class="row mt-3" style="display:none;">
+                                    <div class="col-md-6">
+                                        <label class="form-label">@Localizer["Blink start date"]</label>
+                                        <input asp-for="BlinkStartDate" type="date" class="form-control" />
+                                        <span asp-validation-for="BlinkStartDate" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">@Localizer["Blink end date"]</label>
+                                        <input asp-for="BlinkEndDate" type="date" class="form-control" />
+                                        <span asp-validation-for="BlinkEndDate" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mt-2">
+                                    <input asp-for="MoveToArchive" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Move to archive?"]</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+    <script src="~/CMS/lib/dropzone/dropzone.min.js"></script>
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize Tender Materials multi-select
+            $('#tenderMaterialsSelect').select2({
+                placeholder: "@Localizer["Select materials"]",
+                theme: "bootstrap-5"
+            });
+
+             
+
+            // Blink toggle
+            const $toggle = $('#SpecialOfferBlinkToggle');
+            const $blinkSection = $('#blinkDatesSection');
+
+            function updateBlinkSection() {
+                if ($toggle.is(':checked')) {
+                    $blinkSection.slideDown(200);
+                } else {
+                    $blinkSection.slideUp(200);
+                }
+            }
+
+            $toggle.on('change', updateBlinkSection);
+            updateBlinkSection();
+
+            // Dynamic Other Attachments
+            let attachmentIndex = $('#otherAttachmentsContainer .other-attachment-item').length;
+
+            $('#addAttachmentBtn').on('click', function () {
+                const html = `
+                    <div class="row g-2 mb-2 other-attachment-item">
+                        <div class="col-md-5">
+                            <input type="text" name="TenderOtherAttachments[${attachmentIndex}].Name" class="form-control" placeholder="@Localizer["Attachment name"]" required />
+                        </div>
+                        <div class="col-md-5">
+                            <input type="file" name="TenderOtherAttachments[${attachmentIndex}].File" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" />
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button type="button" class="btn btn-danger remove-attachment w-100">@Localizer["Remove"]</button>
+                        </div>
+                    </div>`;
+                $('#otherAttachmentsContainer').append(html);
+                attachmentIndex++;
+            });
+
+            $(document).on('click', '.remove-attachment', function () {
+                $(this).closest('.other-attachment-item').remove();
+            });
+        });
+    </script>
+
+    <script src="~/CMS/js/tenderForm.js"></script>
+}

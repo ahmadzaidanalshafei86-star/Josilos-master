@@ -1,0 +1,43 @@
+﻿@model IEnumerable<PageViewModel>
+
+<div class="col-md-4">
+    <div class="list-group">
+    
+            @foreach (var Page in Model)
+            {
+
+            <div type="button" class="list-group-item">
+                <i class="fa fa-angle-left" aria-hidden="true"></i><a href="javascript:void(0);"
+                                                                      class="scroll-link"
+                                                                      data-target="link-@Page.Slug">About</a>
+            </div>
+              
+            }
+        
+    </div>
+</div>
+
+<div class="col-md-8">
+    @foreach (var Page in Model)
+    {
+        <div class="resizable" id="link-@Page.Slug" tabindex="-1">
+            <div class="title margin-top">@Page.Title</div>
+            @Page.LongDescription
+        </div>
+        <hr />
+    }
+</div>
+
+<script>
+    document.querySelectorAll('.scroll-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-target');
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.focus({ preventScroll: true }); // sets focus for accessibility
+            }
+        });
+    });
+</script>

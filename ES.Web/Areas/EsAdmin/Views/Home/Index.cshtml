@@ -1,0 +1,162 @@
+﻿@model HomePageViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Main Content Wrapper -->
+<div class="container-fluid">
+    <!-- Row 1: Hero Section Overview Cards -->
+    <div class="row">
+        <!-- Hero Section -->
+        <div class="row my-4">
+            <div class="col-md-8 d-flex flex-column justify-content-center">
+                <h1 class="display-5 fw-bold text-primary">Welcome to your CMS !</h1>
+                <p >Email Solutions is a full-service digital marketing company that focuses on providing the best solutions needed in the best form possible to serve the best interest of the customer.</p>
+                <p >By providing full services based on brand presence, Enterprise & IT Solutions, and Digital Marketing Services, we create a well-rounded story to fulfill your goals.</p>
+                <a href="~/" class="btn btn-lg mt-3 btn-outline-primary fw-bold rounded-pill shadow-sm px-4 py-2" target="_blank">
+                    🚀 Visit Your Website
+                </a>
+            </div>
+            <div class="col-md-4 d-flex justify-content-center">
+                <img src="~/images/Website.svg" alt="Welcome Illustration" class="img-fluid" style="max-width: 350px;">
+            </div>
+        </div>
+    </div>
+
+    <!--Slider-->
+    <div id="featureSlider" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+
+            <!-- Slide 1 -->
+            <div class="carousel-item active">
+                <div class="row">
+
+                    <!-- Categories -->
+                    <div class="col-md-4">
+                        <a href="/Categories" class="text-decoration-none">
+                            <div class="card radius-10 bg-primary text-white">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="service-box bg-white p-3 rounded-circle d-flex justify-content-center align-items-center me-3">
+                                        <i class="lni lni-layout text-primary" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5>@Localizer["Categories"]</h5>
+                                        <p class="mb-0">@Localizer["Organize content effortlessly by creating and managing categories. Keep your CMS structured, making it easier to find and manage information efficiently."]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Pages -->
+                    <div class="col-md-4">
+                        <a href="/Pages" class="text-decoration-none">
+                            <div class="card radius-10 bg-success text-white">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="service-box bg-white p-3 rounded-circle d-flex justify-content-center align-items-center me-3">
+                                        <i class="lni lni-layers text-success" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5>@Localizer["Pages"]</h5>
+                                        <p class="mb-0">@Localizer["Easily add, edit, and publish pages with a user-friendly interface. Manage your website’s content seamlessly and ensure consistency across all sections."]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Upload Documents -->
+                    <div class="col-md-4">
+                        <a href="/UploadDocuments" class="text-decoration-none">
+                            <div class="card radius-10 bg-warning text-white">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="service-box bg-white p-3 rounded-circle d-flex justify-content-center align-items-center me-3">
+                                        <i class="lni lni-files text-warning" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5>@Localizer["Upload Documents"]</h5>
+                                        <p class="mb-0">@Localizer["Securely upload and store important documents. Keep everything organized, accessible, and well-managed within your CMS without any hassle."]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="carousel-item">
+                <div class="row">
+
+                    <!-- Media Management -->
+                    <div class="col-md-4">
+                        <a href="/MediaManagement" class="text-decoration-none">
+                            <div class="card radius-10 bg-danger text-white">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="service-box bg-white p-3 rounded-circle d-flex justify-content-center align-items-center me-3">
+                                        <i class="lni lni-image text-danger" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5>@Localizer["Media Management"]</h5>
+                                        <p class="mb-0">@Localizer["Manage all media files, including images and videos, in one place. Ensure quick access, easy organization, and smooth content integration."]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Users -->
+                    <div class="col-md-4">
+                        <a href="/Users" class="text-decoration-none">
+                            <div class="card radius-10 bg-info text-white">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="service-box bg-white p-3 rounded-circle d-flex justify-content-center align-items-center me-3">
+                                        <i class="lni lni-user text-info" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5>@Localizer["Users"]</h5>
+                                        <p class="mb-0">@Localizer["Add and manage user accounts with ease. Assign permissions, monitor activity, and keep your CMS secure while ensuring smooth collaboration."]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="col-md-4">
+                        <a href="/Roles" class="text-decoration-none">
+                            <div class="card radius-10 bg-dark text-white">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="service-box bg-white p-3 rounded-circle d-flex justify-content-center align-items-center me-3">
+                                        <i class="lni lni-shield text-dark" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5>@Localizer["Roles"]</h5>
+                                        <p class="mb-0">@Localizer["Define roles and set permissions for different users. Maintain security, control access, and ensure a well-structured content management system."]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#featureSlider" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featureSlider" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</div>

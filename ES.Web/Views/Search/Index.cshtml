@@ -1,0 +1,108 @@
+﻿@model List<SearchResultsViewModel>
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Text.RegularExpressions
+@inject IViewLocalizer Localizer
+@using Newtonsoft.Json
+
+@{
+    ViewData["Title"] = "Search Results";
+    string query = ViewData["Query"]?.ToString() ?? "";
+    string sortOrder = ViewData["SortOrder"]?.ToString() ?? "desc";
+}
+
+
+
+
+<!--Title and breadCramp-->
+<div class="caption-inner" >
+    <div class="inner-bg" style="background: url(WebSite/images/header2.jpg) no-repeat fixed center center;"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">@Localizer["Home"]</a></li>
+                    <li class="active">@Localizer["Search"]</li>
+                </ol>
+                <h3><span>@Localizer["Search"]</span></h3>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-inner">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 wow bounceIn" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.2s; animation-name: bounceIn;">
+                <div class="row wow fadeInDown" style="visibility: visible; animation-name: fadeInDown;">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8 logo-search">
+                        <div class="text-center">
+                            <h2>@Localizer["Help and Support Center"]</h2>
+                            <p>@Localizer["What are you looking for?"]</p>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <form method="get" action="@Url.Action("Index", "Search")">
+                                <input type="text" class="form-control2" name="query" value="@query" placeholder="@Localizer["Search articles..."]">
+                                <input type="hidden" name="sortOrder" value="@sortOrder" />
+                                <button type="submit" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-inline" style="margin-bottom:40px;">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <span style="font-size:12px;color:#6472b6;">
+                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                </span>
+                                <select class="form-control" id="sortOrder" onchange="updateSortOrder(baseUrl, query)">
+                                    <option value="desc" selected="@(sortOrder == "desc")">@Localizer["Date (Newest First)"]</option>
+                                    <option value="asc" selected="@(sortOrder == "asc")">@Localizer["Date (Oldest First)"]</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        @if (Model.Any())
+                        {
+                            <h3>Search Results for "@query"</h3>
+                            <div id="search-results">
+                                <!-- Results will be populated by JavaScript -->
+                            </div>
+                            <div class="text-center">
+                                <ul class="pagination" id="pagination">
+                                    <!-- Pagination controls will be populated by JavaScript -->
+                                </ul>
+                            </div>
+                        }
+                        else if (!string.IsNullOrEmpty(query))
+                        {
+                            <p>@Localizer["No results found for"] "@query".</p>
+                        }
+                        else
+                        {
+                            <p>@Localizer["Please enter a search term."]</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+    <script>
+        const searchResults = @Html.Raw(JsonConvert.SerializeObject(Model));
+        const query = @Html.Raw(JsonConvert.SerializeObject(query));
+    </script>
+    <script src="~/WebSite/js/search.js"></script>
+}
+

@@ -1,0 +1,616 @@
+﻿@model PermissionsFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Manage Permissions"];
+}
+
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="~/CMS/assets/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.min.css" />
+}
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">@Localizer["Manage Permissions"]</h4>
+            </div>
+            <div class="card-body">
+                <div class="border p-4 rounded">
+                    <h5 class="mb-4">@Localizer["Role name:"]<span class="text-primary">@Model.RoleName</span></h5>
+                    <h6 class="mb-3 text-uppercase">@Localizer["Add/Remove Permissions"]</h6>
+                    <hr>
+
+                    <div class="card p-4 shadow-sm rounded">
+                        <div class="position-relative">
+                            <input type="text" class="form-control ps-5 rounded-pill border-secondary" id="searchPermissions" placeholder="@Localizer["Search sections..."]" onkeyup="filterPermissions()">
+                            <span class="position-absolute top-50 start-0 translate-middle-y ps-3">
+                                <ion-icon class="lni lni-search" role="img" aria-label="search sharp"></ion-icon>
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <form asp-action="ManagePermissions" method="post">
+                        <input type="hidden" asp-for="RoleId" />
+
+                        <div class="row row-cols-1 row-cols-lg-2 g-4">
+                            <!-- Users Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/users.png" class="img-fluid radius-10" alt="Users">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection1" onchange="toggleSection(0, 4, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer[Model.RoleClaims[0].DisplayValue.Split('.')[1]]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 0; i < 4; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection1" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Roles Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/roles.png" class="img-fluid radius-10" alt="Category">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection2" onchange="toggleSection(4, 8, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer[Model.RoleClaims[4].DisplayValue.Split('.')[1]]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 4; i < 8; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection2" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Categories Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/category.png" class="img-fluid radius-10" alt="Roles">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="card-title mb-0 permission-title">
+                                                        @Localizer[Model.RoleClaims[8].DisplayValue.Split('.')[1]]
+                                                    </h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[8].DisplayValue" />
+                                                        <input asp-for="@Model.RoleClaims[8].IsSelected" class="form-check-input" id="canCreate" onchange="toggleCategorySelection()" />
+                                                        <label class="form-check-label" data-bs-toggle="tooltip" title="Applies to all categories">
+                                                            @Localizer[@Model.RoleClaims[8].DisplayValue.Split('.')[2]]
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[9].DisplayValue" />
+                                                        <input asp-for="@Model.RoleClaims[9].IsSelected" class="form-check-input" id="canRead" onchange="toggleCategorySelection()" />
+                                                        <label class="form-check-label" for="canRead" data-bs-toggle="tooltip" title="Applies to all categories">
+                                                            @Localizer[@Model.RoleClaims[9].DisplayValue.Split('.')[2]]
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Multi-Select Dropdown for Categories -->
+                                                <div class="mb-3">
+                                                    <label for="categorySelect" class="form-label">Select categories (Only for Update/Delete)</label>
+                                                    <select asp-for="CategoriesPermissions.CategoryIds" asp-items="Model.Categories" class="form-select" multiple="multiple" id="categorySelect" disabled>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Update & Delete Permissions -->
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[10].DisplayValue" />
+                                                        <input asp-for="CategoriesPermissions.CanUpdate" class="form-check-input" id="canUpdate" onchange="toggleCategorySelection()" />
+                                                        <label class="form-check-label" for="canUpdate" data-bs-toggle="tooltip" title="Requires category selection">@Localizer["Update"]</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[11].DisplayValue" />
+                                                        <input asp-for="CategoriesPermissions.CanDelete" class="form-check-input" id="canDelete" onchange="toggleCategorySelection()" />
+                                                        <label class="form-check-label" for="canDelete" data-bs-toggle="tooltip" title="Requires category selection">@Localizer["Delete"]</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Help Message -->
+                                                <small class="text-muted" id="helpText">
+                                                    @Localizer["Create and Read apply to all categories, but Update and Delete require selecting specific categories."]
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pages Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/pages.png" class="img-fluid radius-10" alt="Pages">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <h5 class="card-title mb-0 permission-title">
+                                                        @Localizer[Model.RoleClaims[12].DisplayValue.Split('.')[1]]
+                                                    </h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[12].DisplayValue" />
+                                                        <input asp-for="@Model.RoleClaims[12].IsSelected" class="form-check-input" id="canCreatePage" onchange="togglePagesSelection()" />
+                                                        <label class="form-check-label" data-bs-toggle="tooltip" title="Applies to all pages">
+                                                            @Localizer[@Model.RoleClaims[12].DisplayValue.Split('.')[2]]
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[13].DisplayValue" />
+                                                        <input asp-for="@Model.RoleClaims[13].IsSelected" class="form-check-input" id="canReadPage" onchange="togglePagesSelection()" />
+                                                        <label class="form-check-label" for="canReadPage" data-bs-toggle="tooltip" title="Applies to all pages">
+                                                            @Localizer[@Model.RoleClaims[13].DisplayValue.Split('.')[2]]
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Multi-Select Dropdown for Pages -->
+                                                <div class="mb-3">
+                                                    <label for="categorySelectPages" class="form-label">Select pages (Only for Update/Delete)</label>
+                                                    <select asp-for="PagesPermissions.CategoryIds" asp-items="Model.Categories" class="form-select" multiple="multiple" id="categorySelectPages" disabled>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Update & Delete Permissions -->
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[14].DisplayValue" />
+                                                        <input asp-for="PagesPermissions.CanUpdate" class="form-check-input" id="canUpdatePage" onchange="togglePagesSelection()" />
+                                                        <label class="form-check-label" for="canUpdatePage" data-bs-toggle="tooltip" title="Requires page selection">@Localizer["Update"]</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="hidden" asp-for="@Model.RoleClaims[15].DisplayValue" />
+                                                        <input asp-for="PagesPermissions.CanDelete" class="form-check-input" id="canDeletePage" onchange="togglePagesSelection()" />
+                                                        <label class="form-check-label" for="canDeletePage" data-bs-toggle="tooltip" title="Requires page selection">@Localizer["Delete"]</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Help Message -->
+                                                <small class="text-muted" id="helpTextPages">
+                                                    @Localizer["Create and Read apply to all Pages, but Update and Delete require selecting specific pages."]
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Documents Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/document.png" class="img-fluid radius-10" alt="Documents">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection5" onchange="toggleSection(16, 20, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer[Model.RoleClaims[16].DisplayValue.Split('.')[1]]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 16; i < 20; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection5" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Menu Managment Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/menu.png" class="img-fluid radius-10" alt="Menu Managment">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection6" onchange="toggleSection(20, 24, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Menu Managment"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 20; i < 24; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection6" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Media Managment Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/media.png" class="img-fluid radius-10" alt="Media Managment">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection7" onchange="toggleSection(24, 28, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Media Managment"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 24; i < 28; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection7" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Forms Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/Forms.png" class="img-fluid radius-10" alt="Forms">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection8" onchange="toggleSection(28, 32, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Form Builder"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 28; i < 32; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection8" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ProductCategories Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/ProductCategories.png" class="img-fluid radius-10" alt="Forms">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection9" onchange="toggleSection(32, 36, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Product Categories"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 32; i < 36; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection9" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Brands Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/brand.png" class="img-fluid radius-10" alt="Brands">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection10" onchange="toggleSection(36, 40, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Brands"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 36; i < 40; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection10" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Product Attribute Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/cog.png" class="img-fluid radius-10" alt="CogIcon">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection11" onchange="toggleSection(40, 44, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Product Attributes"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 40; i < 44; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection11" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Products Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/box.png" class="img-fluid radius-10" alt="PropductIcon">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection12" onchange="toggleSection(44, 48, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Products"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 44; i < 48; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection12" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Products labels Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/brand.png" class="img-fluid radius-10" alt="labelsIcon">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection13" onchange="toggleSection(48, 52, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Product labels"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 48; i < 52; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection13" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Careers Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/careers.png" class="img-fluid radius-10" alt="CareersIcon">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection14" onchange="toggleSection(52, 56, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Careers"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 52; i < 56; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection14" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social media links Section -->
+                            <div class="col permission-section">
+                                <div class="card radius-10">
+                                    <div class="row g-0 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="p-3">
+                                                <img src="~/CMS/assets/images/ManagePermissions/links.png" class="img-fluid radius-10" alt="linksIcon">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <input type="checkbox" class="form-check-input me-2" id="selectAllSection15" onchange="toggleSection(56, 60, this)" />
+                                                    <h5 class="card-title mb-0 permission-title">@Localizer["Socail media links"]</h5>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-3">
+                                                    @for (int i = 56; i < 60; i++)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input type="hidden" asp-for="@Model.RoleClaims[i].DisplayValue" />
+                                                            <input asp-for="@Model.RoleClaims[i].IsSelected" class="form-check-input roleClaimSection15" id="roleClaim_@i" />
+                                                            <label class="form-check-label" for="roleClaim_@i">
+                                                                @Localizer[@Model.RoleClaims[i].DisplayValue.Split('.')[2]]
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="mt-4 text-start">
+                            <button type="submit" class="btn btn-primary me-2">@Localizer["Save"]</button>
+                            <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/CMS/js/managePermissions.js"></script>
+}

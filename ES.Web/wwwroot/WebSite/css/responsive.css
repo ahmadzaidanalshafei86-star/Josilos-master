@@ -1,0 +1,314 @@
+﻿.news ul li img@media (max-width: 1400px) {
+#cssmenu > ul > li > a {
+    font-size: 14px;    
+	padding: 12px 10px;
+}
+
+.main-wrap {
+    margin: 0 10px;
+}	
+}
+@media (max-width: 1200px) {
+.btn--search{
+
+margin-right:0px;
+margin-top:0px;
+ 
+}
+
+.contacts {
+    color: #0F0F0F !important;
+    padding: 11px 15px !important;
+    font-size: 15px !important;
+    background-color: #fff !important;
+    font-weight: 600;
+display: none;
+}
+#cssmenu > ul > li > a {
+        font-size: 12px;
+        padding: 12px 7px;
+}
+
+.main-wrap {
+    margin: 0 10px;
+}	
+.container-fluid
+{
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+}
+@media (max-width: 1024px) {
+
+.title-overall {
+margin-left:0px 
+}
+
+.fill-img {
+width:100%
+}
+
+}
+@media (max-width: 991px) {
+
+.mobile-z
+{
+        position: absolute;
+        right: 0;
+        top: 55px;
+}
+		
+.fill-img {
+    width:100%;
+    position: absolute;
+    right: 0;
+    border-radius: 0px 0px 0 0px;   
+	background-blend-mode: multiply;
+	background-color: #CECECE;
+}
+	
+.caption-carousel {
+    position: absolute;
+    top: 175px;
+    right: 10%;
+    left: 10%;
+    width: 80%;
+    height: 100%;
+    padding: 55px;
+    text-align: center;
+}	
+	
+.logo img
+{
+	width: 200px;
+}
+
+.news ul li {
+    width: 235px;
+}
+
+.news ul li img {
+    margin: auto;
+    width: 100%;
+    object-fit: cover;
+}
+.counter-bg {
+
+    margin-top: 35px;
+    position: relative;
+    width: auto;
+    z-index: 999;
+    margin-bottom: 30px;
+}
+.color-all {
+    padding: 65px;
+    margin-right: 0;
+    margin-left: 0;
+	margin-top: 25px;
+    border-radius: 20px;
+}
+.color-all2 {
+    padding: 10px 65px 50px 65px;
+    margin-left: 0;
+    margin-right: 0;
+	margin-top: 0px;
+    border-radius: 20px;
+}
+.copyright {
+    margin-bottom: 45px;
+}
+.logo-header {
+    position: absolute;
+    z-index: 99;
+    left: 0;
+    right: 0;
+    top: 135px;
+    margin: auto;        
+	text-align: center;
+}
+
+}
+
+@media (max-width: 912px) {
+.btn--search{
+
+margin-right:46px !important;
+margin-top:-97px !important;
+ 
+}
+.title-overall {
+    margin-left: 0px !important;
+}
+
+}
+ 
+
+@media (max-width: 820px) {
+
+.carousel {
+
+height:735px;
+}
+.btn--search{
+
+margin-right:46px;
+margin-top:-97px;
+ 
+}
+
+.title-overall {
+    margin-left: 0px;
+}
+}
+
+@media (max-width: 768px) {
+.carousel {
+    height: 700px;
+}
+
+.btn--search{
+
+margin-right:46px;
+margin-top:-100px;
+ 
+}
+
+
+.caption-carousel h2 {
+        font-size: 35px;
+        line-height: 48px;
+}
+	
+.caption-carousel h4 {
+    font-size: 14px;
+    line-height: 20px;
+}
+	
+.title-overall {
+    margin-left: 0px;
+    margin-top: 30px;
+}
+.btn-header {
+    padding: 10px 25px;
+    font-size: 14px;
+}
+}
+
+
+
+
+@media (max-width: 767px) {
+.btn--search{
+
+margin-right:46px;
+margin-top:-97px;
+ 
+}
+.img-gallery a{
+ 
+width:fit-content !important;
+    max-height: 100% !important;
+
+}
+
+
+.level {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    column-gap: 10px;
+}
+
+.header {
+
+    padding-bottom: 25px !important;
+    background-color: black !important;
+    padding: 30px 0;
+    position: relative;
+   
+
+}
+
+.title {
+    font-size: 19px;line-height: 35px;
+}
+.title-w {
+    font-size: 19px;line-height: 35px;
+    //margin-left: 93px;
+
+}
+.welcome-text {
+font-size:16px
+}
+.about-text{
+font-size: 17px;
+}
+.counter-bg {
+    margin-left: -20px;
+    margin-right: -20px;
+
+}
+.news ul li .title-1 {
+
+font-size: 15px;
+
+}
+
+.news ul li .text
+{
+font-size: 14px;
+}
+.carousel-m {
+    height: 320px !important;
+	overflow: hidden;
+}
+.heading {
+    font-size: 12px;
+}
+
+.pic-welcome {
+    height: 350px;
+}
+.code_apply {
+    display: block;
+    padding: 12px 20px;
+    margin: 0px 0px 10px 20px;
+    min-height: 50px;
+    color: #fff;
+    width: 100%;
+    float: right;
+}
+.pic-inner {
+    width: 100%;
+    height: auto;
+    margin-left: 0px;
+    margin-bottom: 30px;
+    float: none;
+}
+
+.news ul li {
+    width: 100%;        
+    display: block;
+    margin: 20px 0px;
+    height: auto;
+    padding: 0px 0px  ;
+}
+
+.carousel {
+    height: 259px;
+}
+.caption-carousel {
+         display: none;
+}
+	
+.logo-header {
+         display: none;
+}
+
+}
+
+@media (max-width: 480px) {
+	
+}

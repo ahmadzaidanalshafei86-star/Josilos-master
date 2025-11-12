@@ -1,0 +1,289 @@
+﻿@model IEnumerable<ProductAttributeViewModel>
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Product Attributes"];
+}
+
+@section Styles {
+    <link href="~/CMS/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Left Panel: Add New Attribute -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white rounded-top form-header">
+                    <h5 class="mb-0" id="AttributeFormHeader">
+                        <i class="lni lni-plus-circle"></i> @Localizer["Add New Attribute"]
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="attributeForm">
+                        <input type="hidden" id="attributeId" name="Id" value="0" />
+                        <div class="mb-3">
+                            <label for="attributeName" class="form-label">@Localizer["Attribute Name"]</label>
+                            <input type="text" class="form-control" id="attributeName" required>
+                        </div>
+                        <button type="submit" class="btn btn-outline-success w-100" id="submitButton">
+                            <i class="lni lni-plus" id="submitIcon"></i> <span id="submitText">@Localizer["Add Attribute"]</span>
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Attributes Table -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient-royal text-white rounded-top d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="lni lni-list"></i> @Localizer["Product Attributes"]
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    <!-- Quick Guide Section -->
+                    <div class="mb-3 p-3 bg-light border rounded-3 shadow-sm">
+                        <!-- Quick Guide Button -->
+                        <button class="btn btn-info btn-sm px-3 py-2 rounded-pill shadow-sm fw-semibold d-flex align-items-center gap-2"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#quickGuide"
+                                aria-expanded="false" aria-controls="quickGuide"
+                                style="transition: all 0.3s ease-in-out;">
+                            <i class="lni lni-information fs-5"></i> @Localizer["Quick Guide"]
+                        </button>
+
+                        <!-- Collapsible Guide Section -->
+                        <div id="quickGuide" class="collapse mt-3">
+                            <div class="alert alert-info p-4 rounded-3 shadow-sm border border-light-subtle">
+                                <h6 class="mb-3 text-primary-emphasis d-flex align-items-center gap-2">
+                                    <i class="lni lni-information fs-5"></i> @Localizer["How to Manage Attributes"]
+                                </h6>
+                                <ul class="mb-0 ps-3 small list-unstyled">
+                                    <li class="mb-2 d-flex align-items-center">
+                                        <i class="lni lni-pencil-alt text-primary me-2"></i>
+                                        @Localizer["Click the icons under an attribute name to edit its name or delete the attribute along with its values."]
+                                    </li>
+                                    <li class="mb-2 d-flex align-items-center">
+                                        <i class="lni lni-more-alt text-secondary me-2"></i>
+                                        @Localizer["Click the three dots in the attribute value to edit or delete it."]
+                                    </li>
+                                    <li class="mb-2 d-flex align-items-center">
+                                        <i class="lni lni-world text-success me-2"></i>
+                                        @Localizer["Click the translation icon (🌍) to add translations."]
+                                    </li>
+                                    <li class="mb-2 d-flex align-items-center">
+                                        <i class="lni lni-sort-alpha-asc text-info me-2"></i>
+                                        @Localizer["Drag and drop values to reorder them."]
+                                    </li>
+                                    <li class="fw-bold text-danger d-flex align-items-center">
+                                        <i class="lni lni-warning text-danger me-2"></i>
+                                        @Localizer["Press 'Save Order' after reordering, or changes will be lost."]
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attributes Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="attributesTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>@Localizer["Name"]</th>
+                                    <th>@Localizer["Values"]</th>
+                                    <th class="text-center">@Localizer["Actions"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var attribut in Model)
+                                {
+                                    <tr data-id="@attribut.Id" class="hover-effect">
+
+                                        <!-- Column 1: Attribute Name -->
+                                        <td class="align-middle">
+                                            <div class="fw-medium">@attribut.Name</div>
+
+                                            <!-- Edit & Delete Icons (Initially Hidden) -->
+                                            <div class="d-flex gap-2 mt-1">
+                                                <i class="lni lni-pencil text-warning edit-attribute-icon"
+                                                   data-id="@attribut.Id"
+                                                   data-name="@attribut.Name"
+                                                   title="@Localizer["Edit attribute name"]"
+                                                   style="cursor: pointer; display: none;"></i>
+
+                                                <i class="lni lni-trash text-danger delete-attribute-icon"
+                                                   data-id="@attribut.Id"
+                                                   title="@Localizer["Delete attribute"]"
+                                                   style="cursor: pointer; display: none;"></i>
+                                            </div>
+                                        </td>
+
+                                        <!-- Column 2: Values Container -->
+                                        <td class="align-middle">
+                                            @if (!attribut.Values.Any())
+                                            {
+                                                <div class="text-muted small">@Localizer["This attribute has no values. Click the plus icon to add values."]</div>
+                                            }
+                                            <div class="d-grid valuesContainer"
+                                                 style="grid-template-columns: repeat(3, 1fr);
+                                                        gap: 8px;
+                                                        justify-content: start;
+                                                        max-width: 100%;">
+                                                @foreach (var value in attribut.Values.OrderBy(v => v.Order))
+                                                {
+                                                    <div class="value-item badge bg-bronze text-white px-3 py-2 rounded-pill d-flex align-items-center shadow-sm position-relative"
+                                                         data-id="@value.Id"
+                                                         style="cursor: grab; user-select: none; transition: all 0.2s ease-in-out;">
+
+                                                        <!-- Editable Value Text -->
+                                                        <span class="value-text flex-grow-1 px-2 fw-medium" data-id="@value.Id">@value.Value</span>
+
+                                                        <!-- Custom Three-Dots Menu -->
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm text-white d-flex align-items-center p-1"
+                                                                    type="button"
+                                                                    data-bs-toggle="dropdown"
+                                                                    aria-expanded="false"
+                                                                    aria-label="@Localizer["Options"]"
+                                                                    style="border: none; background: none;">
+                                                                <i class="lni lni-more fs-5"></i> <!-- Three Dots Icon -->
+                                                            </button>
+                                                            <ul class="dropdown-menu shadow-sm border-0">
+                                                                <li>
+                                                                    <a class="dropdown-item edit-value d-flex align-items-center gap-2" href="#" data-id="@value.Id">
+                                                                        <i class="lni lni-pencil"></i> @Localizer["Edit"]
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item delete-value text-danger d-flex align-items-center gap-2" href="#" data-id="@value.Id">
+                                                                        <i class="lni lni-trash"></i> @Localizer["Delete"]
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <!-- Save Order Button (Initially Hidden) -->
+                                            <button class="btn btn-outline-success btn-sm mt-2 saveOrderBtn" style="display: none;">
+                                                <i class="lni lni-save"></i> @Localizer["Save Order"]
+                                            </button>
+                                            <div class="text-danger small mt-1 saveOrderMessage" style="display: none;">
+                                                @Localizer["Press 'Save Order' before moving to another attribute. If you don't save, changes will be lost."]
+                                            </div>
+                                        </td>
+
+                                        <!-- Column 3: Action Buttons -->
+                                        <td class="text-center align-middle">
+                                            <div class="d-flex justify-content-center gap-1">
+
+                                                <!-- Add Value Button -->
+                                                <i class="lni lni-plus text-success fs-4 addValueBtn"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#addValueModal"
+                                                   data-id="@attribut.Id"
+                                                   data-name="@attribut.Name"
+                                                   title="@Localizer["Add Value"]"
+                                                   style="cursor: pointer; transition: all 0.3s ease-in-out; padding: 4px 6px; border-radius: 6px;"
+                                                   onmouseover="this.style.backgroundColor='#d4edda'; this.style.transform='scale(1.15)';"
+                                                   onmouseout="this.style.backgroundColor='transparent'; this.style.transform='scale(1)';">
+                                                </i>
+                                                <!-- Translation Button -->
+                                                <a asp-controller="ProductAttributesTranslates"
+                                                   asp-action="Index"
+                                                   asp-route-productAttributeId="@attribut.Id"
+                                                   title="@Localizer["Translations"]"
+                                                   style="text-decoration: none; display: inline-block; cursor: pointer;">
+                                                    <i class="lni lni-world text-primary fs-4 translateBtn"
+                                                       style="cursor: pointer; transition: all 0.3s ease-in-out; padding: 4px 6px; border-radius: 6px;"
+                                                       onmouseover="this.style.backgroundColor='#cce5ff'; this.style.transform='scale(1.15)';"
+                                                       onmouseout="this.style.backgroundColor='transparent'; this.style.transform='scale(1)';">
+                                                    </i>
+                                                </a>
+
+
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Attribute Values -->
+<div class="modal fade" id="addValueModal" tabindex="-1" aria-labelledby="addValueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="addValueModalLabel">
+                    <i class="lni lni-tags"></i> @Localizer["Add value to"] <span id="attributeTitle"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addValueForm">
+                    <input type="hidden" id="attributeId">
+                    <div class="mb-3">
+                        <label for="attributeValue" class="form-label">@Localizer["Value"]</label>
+                        <input type="text" class="form-control" id="attributeValue" required pattern=".{1,30}" title="@Localizer["Maximam 30 characters"]">
+                    </div>
+                    <div class="mb-3">
+                        <label for="valueOrder" class="form-label">@Localizer["Order"]</label>
+                        <input type="number" class="form-control" id="valueOrder" min="1" value="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="lni lni-save"></i> @Localizer["Save Value"]
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Plugins {
+    <script src="~/CMS/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/CMS/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/CMS/assets/js/table-datatable.js"></script>
+}
+
+@section Scripts {
+
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll("tr.hover-effect").forEach(function(row) {
+                row.addEventListener("mouseover", function() {
+                    let icons = this.querySelectorAll(".edit-attribute-icon, .delete-attribute-icon");
+                    icons.forEach(icon => icon.style.display = "inline-block");
+                });
+
+                row.addEventListener("mouseout", function() {
+                    let icons = this.querySelectorAll(".edit-attribute-icon, .delete-attribute-icon");
+                    icons.forEach(icon => icon.style.display = "none");
+                });
+            });
+        });
+    </script>
+    <script>
+        var currentLanguage = "@(CultureInfo.CurrentUICulture.Name == "ar-JO" ? "ar" : "en")";
+    </script>
+
+    <script src="~/CMS/js/productAttributes.js"></script>
+}

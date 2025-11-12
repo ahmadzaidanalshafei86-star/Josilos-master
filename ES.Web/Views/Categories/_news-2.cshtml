@@ -1,0 +1,155 @@
+﻿@model IList<PageViewModel>
+
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+
+
+
+
+<div class="col-md-12">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+
+         
+
+            <div class="row">
+                <div class="col-md-5">
+                    <div style="background:url('images/Pages/@item.FeaturedImageUrl') no-repeat left center;height:280px; background-size: cover;"></div>
+                </div>
+                <div class="col-md-7 section-news">
+                    <div class="title-news"> @item.Title</div>
+                    <div class="date-news">
+                        <i class="far fa-calendar-alt"></i>@if (item.DateInput != null)
+                        {
+                            @item.DateInput.Value.ToString("dd MMM, yyyy")
+                        }
+                                        else
+                        {
+                            <span>""</span>
+                        }
+                    </div>
+                    <div>@item.ShortDescription</div>
+                    <div><a href="@item.LinkUrl" class="btn-header btn-more">@Localizer["continue reading"]</a></div>
+
+
+                </div>
+              
+
+            </div>
+
+            <hr>
+
+
+
+
+           
+
+
+
+
+        }
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+@* @{
+    // Sort by DateInput descending and take the latest 3 for the sidebar
+    var latestNews = Model
+        .Where(p => p.DateInput.HasValue)
+        .OrderByDescending(p => p.DateInput!.Value)
+        .Take(3)
+        .ToList();
+}
+
+
+<div class="col-md-8">
+    @if (Model.Count > 0)
+    {
+        // First item
+        var firstItem = Model[0];
+        <div class="news-inner">
+            <img alt="@firstItem.FeaturedImageUrl" src="~/images/Pages/@firstItem.FeaturedImageUrl" class="img-responsive" />
+            <div class="title-1">
+                @if (firstItem.DateInput != null)
+                {
+                    @firstItem.DateInput.Value.ToString("dd, MMM, yyyy")
+                }
+            </div>
+            <div class="text">@firstItem.Title</div>
+            <div class="more-news-inner">
+                <a href="@firstItem.LinkUrl" class="btn-header btn-more">
+                    @Localizer["continue reading"]
+                </a>
+            </div>
+        </div>
+
+        // Remaining items, 2 per row
+        for (int i = 1; i < Model.Count; i += 2)
+        {
+            <div class="row">
+                @for (int j = i; j < i + 2 && j < Model.Count; j++)
+                {
+                    var item = Model[j];
+                    <div class="col-sm-6">
+                        <div class="news-inner">
+                            <img alt="@item.FeaturedImageUrl" src="~/images/Pages/@item.FeaturedImageUrl" class="img-responsive" />
+                            <div class="title-1">
+                                @if (item.DateInput != null)
+                                {
+                                    @item.DateInput.Value.ToString("dd, MMM, yyyy")
+                                }
+                            </div>
+                            <div class="text">@item.Title</div>
+                            <div class="more-news-inner">
+                                <a href="@item.LinkUrl" class="btn-header btn-more">
+                                    @Localizer["continue reading"]
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+<div class="col-md-4">
+    <div class="title-2">
+        @Localizer["latest news"]
+    </div>
+
+    @foreach (var news in latestNews)
+    {
+        <div class="box-news-all mb-3">
+            <a href="@news.LinkUrl">
+                <div class="box-news" style="background-image:url('@Url.Content("~/images/Pages/" + news.FeaturedImageUrl)')"></div>
+                <div class="box-news-text">
+                    <div class="news2-time">@news.DateInput?.ToString("dd, MMMM, yyyy")</div>
+                    <div class="text-all">
+                        @(
+                            news.Title!.Length > 150
+                            ? news.Title.Substring(0, 150) + "..."
+                            : news.Title
+                            )
+                    </div>
+                </div>
+            </a>
+        </div>
+        <hr />
+    }
+
+</div> *@

@@ -1,0 +1,85 @@
+﻿@model SilosDeclerationsViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.Extensions.Options
+@using System.Globalization
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@inject IViewLocalizer Localizer
+
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var currentCulture = CultureInfo.CurrentCulture.Name;
+    var isArabic = currentCulture.StartsWith("ar", StringComparison.OrdinalIgnoreCase);
+    var supportedCultures = LocOptions.Value.SupportedUICultures;
+    var returnUrl = Url.Content("~") + Context.Request.Path + Context.Request.QueryString;
+}
+
+<!-- Page Header -->
+<div class="caption-inner">
+    <div class="inner-bg" style="background: url('/WebSite/images/header2.jpg') no-repeat fixed center center; background-size: cover;"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-center text-light py-4">
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a href="/">@Localizer["Home"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["Declarations"]</li>
+                </ol>
+                <h3 class="fw-bold"><span>@Localizer["Declarations"]</span></h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="content-inner py-5">
+    <div class="container">
+        @if (Model.SilosDecleration != null && Model.SilosDecleration.Any())
+        {
+            <div class="row g-4">
+                @foreach (var decl in Model.SilosDecleration)
+                {
+                    var subject = isArabic ? decl.SubjectAr : decl.Subject;
+                    var description = isArabic ? decl.DescriptionAr : decl.Description;
+                    var notes = isArabic ? decl.NotesAr : decl.Notes;
+
+                    <div class="col-lg-6 col-md-6 col-sm-12 h-100 shadow-sm border-0">
+                        <div class="">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-primary">@subject</h5>
+
+                                <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                                    <strong>@Localizer["Created At"]:</strong> @decl.CreatedAt.ToString("dd/MM/yyyy")<br />
+                                    <strong>@Localizer["Start Date"]:</strong> @decl.StartDate.ToString("dd/MM/yyyy")<br />
+                                    <strong>@Localizer["End Date"]:</strong> @decl.EndDate.ToString("dd/MM/yyyy")
+                                </p>
+
+                                <p class="card-text" style="min-height: 80px;">
+                                    @Html.Raw(Regex.Replace(description ?? string.Empty, "<.*?>", string.Empty))
+                                </p>
+
+                                @if (!string.IsNullOrWhiteSpace(notes))
+                                {
+                                    <div class="alert alert-light border mt-2 p-2">
+                                        <strong>@Localizer["Notes"]:</strong> @notes
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                @Localizer["No declarations available at the moment."]
+            </div>
+        }
+    </div>
+</div>

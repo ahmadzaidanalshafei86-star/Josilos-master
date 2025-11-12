@@ -1,0 +1,28 @@
+﻿@model List<MenuItemViewModel>
+
+@foreach (var menuItem in Model)
+{
+    <li class="@(menuItem.Children.Any() ? "has-sub" : "")">
+        <a href="@(menuItem.Type == "Page"
+         ? Url.Action("Index", "Page", new { slug = menuItem.Url })
+         : menuItem.Type == "Category"
+         ? Url.Action("Index", "Categories", new { slug = menuItem.Url })
+         : menuItem.Url)" target="@menuItem.Target">
+
+            @if (!string.IsNullOrEmpty(menuItem.Icon))
+            {
+                <img alt="@menuItem.Title" src="@menuItem.Icon" />
+            }
+            else
+            {
+                @menuItem.Title
+            }
+        </a>
+        @if (menuItem.Children.Any())
+        {
+            <ul>
+                @await Html.PartialAsync("_MenuItemChildren.cshtml", menuItem.Children)
+            </ul>
+        }
+    </li>
+}

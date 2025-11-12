@@ -1,0 +1,129 @@
+﻿@model FormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Model.Id > 0 ? @Localizer["Edit Form"] : @Localizer["Create Form"];
+}
+
+<div class="container mt-1">
+    <div class="card shadow-sm border-0 rounded-lg">
+        <div class="card-body">
+            <form id="formBuilder" method="post">
+                <input type="hidden" asp-for="Id" id="formId" />
+                <!-- Form Title -->
+                <div class="mb-4">
+                    <input type="text" class="form-control fs-4 fw-bold border-0 shadow-none"
+                           asp-for="Title" id="formTitle" placeholder="@Localizer["Form Title"]" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <!-- Form Description -->
+                <div class="mb-4">
+                    <textarea class="form-control border-0 shadow-none"
+                              asp-for="Description" id="formDescription" placeholder="@Localizer["Form Description"]"></textarea>
+                </div>
+
+                <!-- Admin Email Section -->
+                <div class="mb-4 p-3 bg-light rounded shadow-sm">
+                    <label for="formEmail" class="form-label fw-bold d-block">@Localizer["Notification Email (Optional)"]</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-0 shadow-sm">
+                            <i class="lni lni-envelope"></i>
+                        </span>
+                        <input type="email" class="form-control border-0 shadow-sm"
+                               asp-for="Email" id="formEmail" placeholder="@Localizer["Enter email for notifications"]" />
+                    </div>
+                    <small class="form-text text-muted d-block mt-2">
+                        <i class="lni lni-info-circle"></i> @Localizer["This email will receive a notification each time someone submits a response."]
+                    </small>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+
+
+                <!-- Fields Container -->
+                <div id="fieldsContainer" class="d-flex flex-column gap-3"></div>
+
+                <!-- Add New Field Button -->
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-outline-success rounded-lg px-3" id="addFieldBtn">
+                        <i class="lni lni-plus"></i> @Localizer["Add Question"]
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-info px-4 rounded-lg" id="previewFormBtn">
+                        <i class="lni lni-eye"></i> @Localizer["Preview"]
+                    </button>
+                    <button id="saveFormBtn" type="submit" class="btn btn-primary px-4 rounded-lg">
+                        <i class="lni lni-save"></i> @Localizer["Save Form"]
+                    </button>
+                </div>
+
+                <input type="hidden" id="formFieldsData" value='@Html.Raw(Json.Serialize(Model.Fields))' />
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="formPreviewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewFormTitle">@Localizer["Preview Form"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Close"]"></button>
+            </div>
+            <div class="modal-body">
+                <p id="previewFormDescription" class="text-muted"></p>
+                <form id="previewFormContainer">
+                    <!-- Preview Fields will be inserted here dynamically -->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        var localization = {
+            formTitle: "@Localizer["Form Title"]",
+            formDescription: "@Localizer["Form Description"]",
+            addQuestion: "@Localizer["Add Question"]",
+            preview: "@Localizer["Preview"]",
+            saveForm: "@Localizer["Save Form"]",
+            previewForm: "@Localizer["Preview Form"]",
+            close: "@Localizer["Close"]",
+            enterQuestion: "@Localizer["Enter your question"]",
+            enterHint: "@Localizer["Enter a hint (optional)"]",
+            shortAnswer: "@Localizer["Short Answer"]",
+            paragraph: "@Localizer["Paragraph"]",
+            phoneNumber: "@Localizer["Phone Number"]",
+            emailAddress: "@Localizer["Email Address"]",
+            multipleChoice: "@Localizer["Multiple Choice"]",
+            checkboxes: "@Localizer["Checkboxes"]",
+            fileUpload: "@Localizer["File Upload"]",
+            rating: "@Localizer["Rating"]",
+            datePicker: "@Localizer["Date Picker"]",
+            required: "@Localizer["Required"]",
+            publish: "@Localizer["Publish"]",
+            addOption: "@Localizer["Add Option"]"
+        };
+
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // e.g., "en-US" or "ar"
+    </script>
+
+    <script>
+        const formFields = @Html.Raw(Json.Serialize(Model.Fields)); // Works in .cshtml
+    </script>
+    <script src="~/CMS/js/createForm.js"></script>
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+}

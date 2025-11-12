@@ -1,0 +1,38 @@
+﻿@page
+@model AccessDeniedModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+
+@{
+    Layout = "~/Areas/EsAdmin/Views/Shared/_CMSLayout.cshtml";
+    ViewData["Title"] = Localizer["Access denied"];
+}
+
+
+<div class="card radius-10">
+    <div class="row g-0">
+        <div class="col-12 col-xl-5">
+            <div class="card-body">
+                <h1 class="display-1"><span class="text-danger">4</span><span class="text-primary">0</span><span class="text-warning">3</span></h1>
+                <h2 class="font-weight-bold display-4">@Localizer["Access Denied"]</h2>
+                <p>
+                    @Localizer["It seems that you don't have the necessary privileges to access this content."]
+                    <br>@Localizer["You do not have permission to view this page."]
+                    <br>@Localizer["Please contact your administrator or return to the previous page."]
+                </p>
+                <div class="mt-5">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-info btn-lg px-md-5 radius-30">@Localizer["Go Home"]</a>
+                    <a onclick="window.history.back();" class="btn btn-outline-dark btn-lg ms-3 px-md-5 radius-30">@Localizer["Back"]</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-7">
+            <img src="~/CMS/assets/images/error/auth-img-7.png" class="img-fluid" alt="Access Denied Image">
+        </div>
+    </div>
+    <!--end row-->
+</div>
+
+

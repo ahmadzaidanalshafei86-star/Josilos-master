@@ -1,0 +1,78 @@
+﻿@model IEnumerable<PageViewModel>
+
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+
+<div class="col-md-12">
+    @foreach (var Page in Model.Select((value, index) => new { value, index }))
+    {
+        bool isOddRow = Page.index % 2 == 0;
+
+        var html = Page.value.LongDescription;
+        string preview = "";
+
+        if (!string.IsNullOrWhiteSpace(html))
+        {
+            var plainText = Regex.Replace(html, "<.*?>", string.Empty);
+            var words = plainText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            preview = string.Join(" ", words.Take(32)) + (words.Length > 32 ? " ..." : "");
+        }
+
+
+        <div class="row">
+            @if (isOddRow)
+            {
+                <!-- Even indices (0,2,4): Image first, then Content (odd style) -->
+                <div class="col-md-5">
+                    <div style="background:url('/images/pages/@Page.value.FeaturedImageUrl') no-repeat left center;height:280px; background-size: cover; border-radius:10px;"></div>
+                </div>
+
+                <div class="col-md-7 section-news">
+                    <div class="title-news">@Page.value.Title</div>
+                    <div class="date-news">
+                        <i class="far fa-calendar-alt"></i>
+                        @if (Page.value.DateInput != null)
+                        {
+                            @Page.value.DateInput.Value.ToString("dd MMM, yyyy")
+                        }
+                        else
+                        {
+                            <span>""</span>
+                        }
+                    </div>
+                    <p>@preview</p>
+                    <div><a href="@Page.value.LinkUrl" class="btn-header btn-more">@Localizer["Read More"]</a></div>
+                </div>
+            }
+            else
+            {
+                <!-- Odd indices (1,3,5): Content first, then Image (even style) -->
+                <div class="col-md-7 section-news">
+                    <div class="title-news">@Page.value.Title</div>
+                    <div class="date-news">
+                        <i class="far fa-calendar-alt"></i>
+                        @if (Page.value.DateInput != null)
+                        {
+                            @Page.value.DateInput.Value.ToString("MMM dd, yyyy")
+                        }
+                        else
+                        {
+                            <span>""</span>
+                        }
+                    </div>
+                    <p>@preview</p>
+                    <div><a href="@Page.value.LinkUrl" class="btn-header btn-more">@Localizer["Read More"]</a></div>
+                </div>
+
+                <div class="col-md-5">
+                    <div style="background:url('@Url.Content("~/images/Pages/" + Page.value.FeaturedImageUrl)') no-repeat left center;height:280px; background-size: cover; border-radius:10px;"></div>
+                </div>
+            }
+        </div>
+
+        <hr />
+    }
+</div>

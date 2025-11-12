@@ -1,0 +1,190 @@
+﻿@model UserFormViewModel
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @(!string.IsNullOrEmpty(Model?.Id)
+                            ? Localizer["Edit user"]
+                            : Localizer["Add user"])
+                    </h6>
+                    <hr>
+                    <form method="post" asp-controller="Users">
+                        @Html.AntiForgeryToken()
+                        @if (!string.IsNullOrEmpty(Model?.Id))
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+                        <div class="row g-3">
+                            <!-- Username -->
+                            <div class="col-md-6">
+                                <label for="inputUsername" class="form-label">@Localizer["Username"]</label>
+                                <input type="text" id="inputUsername" class="form-control" placeholder=@Localizer["Enter username"] asp-for="UserName">
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <label for="inputEmail" class="form-label">@Localizer["Email"]</label>
+                                <input type="email" id="inputEmail" class="form-control" placeholder=@Localizer["Enter email"] asp-for="Email">
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <!-- Password (only for new user) -->
+                            @if (string.IsNullOrEmpty(Model?.Id))
+                            {
+                                <div class="col-md-6">
+                                    <label for="inputPassword" class="form-label">@Localizer["Password"]</label>
+                                    <input type="password" id="inputPassword" class="form-control" placeholder=@Localizer["Enter password"] asp-for="Password">
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="inputConfirmPassword" class="form-label">@Localizer["Confirm Password"]</label>
+                                    <input type="password" id="inputConfirmPassword" class="form-control" placeholder=@Localizer["Confirm Password"] asp-for="ConfirmPassword">
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                </div>
+                            }
+
+                            <h6 class="mb-0 text-uppercase">@Localizer["Manage Access"]</h6>
+                            <hr>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select pb-2" asp-for="Role" asp-items="Model.Roles" id="roleSelect">
+                                        <option value="" selected> -- @Localizer["Select role"] -- </option>
+                                        <option value="addAnotherRole">@Localizer["Add new role . . ."]</option>
+                                    </select>
+                                    <label asp-for="Role">@Localizer["Role"]</label>
+                                </div>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        </div>
+
+                        <!-- Buttons Section -->
+                        <div class="mt-4 d-flex align-items-center justify-content-start">
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary me-2">@Localizer["Submit"]</button>
+
+                            @*   <!-- Link to Add New Role -->
+                            <a asp-controller="Roles" asp-action="Create" class="btn btn-success d-flex align-items-center">
+                                <ion-icon class="lni lni-plus me-2" style="font-size: 1.2rem;"></ion-icon>
+                                Add New Role
+                            </a> *@
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const baseUrl = window.appBaseUrl || '/';
+        // Function to save form state to local storage
+        function saveFormState() {
+            // Get all form data
+            const formData = {
+                userName: document.getElementById('inputUsername').value,
+                email: document.getElementById('inputEmail').value,
+                password: document.getElementById('inputPassword') ? document.getElementById('inputPassword').value : '',
+                confirmPassword: document.getElementById('inputConfirmPassword') ? document.getElementById('inputConfirmPassword').value : ''
+            };
+
+            // Save form data to local storage
+            localStorage.setItem('userFormData', JSON.stringify(formData));
+        }
+
+        // Function to populate form from local storage
+        function populateFormState() {
+            // Get form data from local storage
+            const formData = JSON.parse(localStorage.getItem('userFormData'));
+
+            if (formData) {
+                document.getElementById('inputUsername').value = formData.userName;
+                document.getElementById('inputEmail').value = formData.email;
+                if (document.getElementById('inputPassword')) {
+                    document.getElementById('inputPassword').value = formData.password;
+                }
+                if (document.getElementById('inputConfirmPassword')) {
+                    document.getElementById('inputConfirmPassword').value = formData.confirmPassword;
+                }
+            }
+        }
+
+        // Function to clear local storage after a delay
+        function clearFormStateAfterDelay() {
+            // Set a timeout to clear form data after 10 seconds
+            setTimeout(() => {
+                localStorage.removeItem('userFormData');
+            }, 10000);  // 10000ms = 10 seconds
+        }
+
+        // Event listener for role selection to save form state
+        document.getElementById('roleSelect')?.addEventListener('change', function () {
+            // Get the selected value from the dropdown
+            var selectedValue = this.value;
+
+            // Check if the user selected "addAnotherRole"
+            if (selectedValue === 'addAnotherRole') {
+                // Save form state to local storage only if "Add new role" is selected
+                saveFormState();
+                clearTimeout(window.formTimeout); // Reset timeout on user input
+                window.formTimeout = setTimeout(() => {
+                    localStorage.removeItem('userFormData');
+                }, 10000); // Reset the 10-second timer
+            } else {
+                // Optionally, clear the form state if another role is selected
+                localStorage.removeItem('userFormData');
+            }
+        });
+
+        // Populate form state on page load
+        window.addEventListener('load', function() {
+            populateFormState();
+            clearFormStateAfterDelay(); // Start the 10-second timer on page load
+        });
+
+        // Event listener for form submission to clear local storage
+        document.querySelector('form').addEventListener('submit', function () {
+            // Clear local storage when the form is submitted
+            localStorage.removeItem('userFormData');
+        });
+
+        // Event listener to handle role selection and redirect
+        document.getElementById('roleSelect')?.addEventListener('change', function () {
+            // Get the selected value from the dropdown
+            var selectedValue = this.value;
+
+            // Check if the user selected "addAnotherRole"
+            if (selectedValue === 'addAnotherRole') {
+                var modelId = '@Model?.Id';
+
+                // Construct the redirect URL
+                var redirectUrl = `${baseUrl}EsAdmin/Roles/Create?returnUrl=` + encodeURIComponent("true");
+
+                if (modelId) {
+                    redirectUrl += '&id=' + encodeURIComponent(modelId);
+                }
+
+                // Redirect the user to the Add Role page
+                window.location.href = redirectUrl;
+            }
+        });
+    </script>
+
+
+
+}

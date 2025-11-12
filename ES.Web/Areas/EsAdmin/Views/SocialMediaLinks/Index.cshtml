@@ -1,0 +1,239 @@
+﻿@model IEnumerable<SocialMediaLink>
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["SocialMediaLinks"];
+}
+
+@section Styles {
+    <link href="~/CMS/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="~/CMS/css/translationindex.css" rel="stylesheet" />
+    <style>
+        select option i {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+}
+
+<h6 class="mb-0 text-uppercase">@Localizer["SocialMediaLinks"]</h6>
+<hr />
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-4">
+                <button type="button" class="btn btn-success d-flex align-items-center justify-content-center shadow-sm rounded-3 w-100" data-bs-toggle="modal" data-bs-target="#addSocialMediaModal">
+                    <ion-icon class="lni lni-plus me-2" style="font-size: 1.4rem;"></ion-icon>
+                    <span>@Localizer["AddNewLink"]</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="table" class="table table-info table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>@Localizer["Logo"]</th>
+                        <th>@Localizer["Name"]</th>
+                        <th>@Localizer["URL"]</th>
+                        <th>@Localizer["Published"]</th>
+                        <th>@Localizer["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var link in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(link.IconClass))
+                                {
+                                    <i class="@link.IconClass" style="color:@link.IconColor; font-size: 24px;"></i>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@Localizer["NoImage"]</span>
+                                }
+                            </td>
+                            <td>@link.Name</td>
+                            <td><a href="@link.Url" target="_blank">@link.Url</a></td>
+                            <td>
+                                <span class="badge rounded-pill bg-@(link.IsPublished ? "success" : "danger")"
+                                      data-status="@(link.IsPublished ? "Published" : "Unpublished")">
+                                    @(link.IsPublished ? Localizer["Published"] : Localizer["Unpublished"])
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a class="edit-btn me-2"
+                                       data-id="@link.Id"
+                                       data-url="@link.Url"
+                                       data-icon="@link.IconClass"
+                                       data-color="@link.IconColor"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#editSocialMediaModal"
+                                       data-bs-tooltip="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title="@Localizer["Edit"]">
+                                        <ion-icon class="lni lni-pencil-alt md hover-scale text-warning" role="img"></ion-icon>
+                                    </a>
+                                    <a class="toggle-status me-2"
+                                       data-link-id="@link.Id"
+                                       data-published="@link.IsPublished.ToString().ToLower()"
+                                       data-bs-tooltip="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title="@(link.IsPublished ? Localizer["Unpublish"] : Localizer["Publish"])">
+                                        @if (link.IsPublished)
+                                        {
+                                            <ion-icon class="lni lni-download md hover-scale text-success" role="img"></ion-icon>
+                                        }
+                                        else
+                                        {
+                                            <ion-icon class="lni lni-upload md hover-scale text-success" role="img"></ion-icon>
+                                        }
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addSocialMediaModal" tabindex="-1" aria-labelledby="addSocialMediaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSocialMediaModalLabel">@Localizer["AddSocialMediaLink"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addSocialMediaForm" asp-action="Create" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Name"]</label>
+                        <input type="text" class="form-control" name="Name" maxlength="15" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["URL"]</label>
+                        <input type="url" class="form-control" name="Url" maxlength="200" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Icon"]</label>
+                        <select class="form-control" name="IconClass" id="addIconClass" required>
+                            <option value="" disabled selected>@Localizer["SelectIcon"]</option>
+                            <option value="fab fa-facebook-f">Facebook</option>
+                            <option value="fab fa-x-twitter">X</option>
+                            <option value="fab fa-instagram">Instagram</option>
+                            <option value="fab fa-linkedin-in">LinkedIn</option>
+                            <option value="fab fa-youtube">YouTube</option>
+                            <option value="fab fa-tiktok">TikTok</option>
+                            <option value="fab fa-pinterest">Pinterest</option>
+                            <option value="fab fa-snapchat-ghost">Snapchat</option>
+                            <option value="fab fa-telegram">Telegram</option>
+                            <option value="fab fa-whatsapp">WhatsApp</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["IconColor"]</label>
+                        <input type="color" class="form-control form-control-color" name="IconColor" value="#000000" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editSocialMediaModal" tabindex="-1" aria-labelledby="editSocialMediaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editSocialMediaModalLabel">@Localizer["EditSocialMediaLink"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editSocialMediaForm" asp-action="Update" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" id="editId" />
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["URL"]</label>
+                        <input type="url" class="form-control" name="Url" id="editUrl" maxlength="200" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Icon"]</label>
+                        <select class="form-control" name="IconClass" id="editIconClass" required>
+                            <option value="" disabled>@Localizer["SelectIcon"]</option>
+                            <option value="fab fa-facebook-f">Facebook</option>
+                            <option value="fab fa-x-twitter">X</option>
+                            <option value="fab fa-instagram">Instagram</option>
+                            <option value="fab fa-linkedin-in">LinkedIn</option>
+                            <option value="fab fa-youtube">YouTube</option>
+                            <option value="fab fa-tiktok">TikTok</option>
+                            <option value="fab fa-pinterest">Pinterest</option>
+                            <option value="fab fa-snapchat-ghost">Snapchat</option>
+                            <option value="fab fa-telegram">Telegram</option>
+                            <option value="fab fa-whatsapp">WhatsApp</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Icon Color"]</label>
+                        <input type="color" class="form-control form-control-color" name="IconColor" id="editIconColor" value="#000000" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">@Localizer["Update"]</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <script src="~/CMS/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/CMS/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/CMS/assets/js/table-datatable.js"></script>
+}
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name';
+    </script>
+
+    <script src="~/CMS/js/socialMediaLinks.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-tooltip="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            $('.edit-btn').click(function () {
+                var id = $(this).data('id');
+                var url = $(this).data('url');
+                var icon = $(this).data('icon');
+                var color = $(this).data('color');
+
+                $('#editId').val(id);
+                $('#editUrl').val(url);
+                $('#editIconClass').val(icon);
+                $('#editIconColor').val(color || '#000000');
+            });
+
+            // Ensure Font Awesome icons render in select dropdown
+            $('#addIconClass, #editIconClass').each(function() {
+                $(this).find('option').each(function() {
+                    if ($(this).val() !== '') {
+                        $(this).html('<i class="' + $(this).val() + '"></i> ' + $(this).text());
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,13 @@
+﻿@model IEnumerable<PageViewModel>
+<div class="col-md-12">
+
+    <div class="collapsible-all">
+        @foreach (var Page in Model)
+        {
+            <button class="collapsible">@Page.Title</button>
+            <div class="content">
+                @Html.Raw(Page.ShortDescription)
+            </div>
+        }
+    </div>
+</div>

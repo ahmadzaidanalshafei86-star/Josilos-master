@@ -1,0 +1,38 @@
+﻿@model TopViewModel
+
+
+
+
+
+<div class="top wow fadeInDown animated" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInDown ;">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-4 col-md-4 col-sm-4">
+                @if (Model.Pages.Count > 0)
+                {
+                    @Html.Raw(Model.Pages[0].ShortDescription)
+                }
+            </div>
+
+            <div class="col-lg-5 col-md-4 col-sm-4">
+                @if (Model.Pages.Count > 1)
+                {
+                    @Html.Raw(Model.Pages[1].ShortDescription)
+                }
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-4">
+
+                @await Component.InvokeAsync("SocialMediaIcons")
+               
+
+            </div>
+
+
+
+
+
+        </div>
+    </div>
+</div>

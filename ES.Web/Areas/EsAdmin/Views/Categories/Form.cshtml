@@ -1,0 +1,243 @@
+﻿@model CategoryFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Category"];
+}
+
+@section Styles {
+    <link href="~/CMS/lib/dropzone/dropzone.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @((Model.Id > 0)
+                            ? Localizer["Edit category"]
+                            : Localizer["Add category"])
+                    </h6>
+                    <hr>
+                    <form id="my-Form" method="post" enctype="multipart/form-data" asp-controller="Categories">
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+                        <div class="row g-3">
+
+                            <!-- Category Name -->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Category name"]</label>
+                                <input asp-for="Name" class="form-control"
+                                       disabled="@(Model.Name == "Home Slider" ? "disabled" : null)" />
+
+                                @if (Model.Name == "Home Slider")
+                                {
+                                    <input type="hidden" asp-for="Name" />
+                                }
+
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <!-- Parent Category -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Parent category"]</label>
+                                <select id="parentCategoryDropdown" asp-for="ParentCategoryId" asp-items="Model.Categories" class="form-select">
+                                    <option value="" selected>@Localizer["Main category"]</option>
+                                </select>
+                                <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
+                            </div>
+
+                            <!--Relate Caregories-->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Related categories"]</label>
+                                <select id="relatedCategoriesDropdown"
+                                        asp-for="RelatedCategoryIds" asp-items="Model.Categories"
+                                        multiple="multiple"
+                                        class="form-select">
+                                </select>
+                                <span asp-validation-for="RelatedCategoryIds" class="text-danger"></span>
+                            </div>
+
+                            <!-- Short Description -->
+                            <div class="col-md-6">
+                                <label class="form-label ">@Localizer["Short description"]</label>
+                                <textarea id="tinyMCEShortDesc" asp-for="ShortDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Long Description -->
+                            <div class="col-md-6">
+                                <label class="form-label ">@Localizer["Long description"]</label>
+                                <textarea id="tinyMCELongDesc" asp-for="LongDescription" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="LongDescription" class="text-danger"></span>
+                            </div>
+
+                            <div class="row p-3">
+                                <!-- Cover Image Section -->
+                                <div class="col-md-6">
+                                    <label class="form-label">@Localizer["Cover image"]</label>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <input asp-for="CoverImage"
+                                               type="file"
+                                               class="form-control"
+                                               id="CoverImage"
+                                               accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                               data-hidden-input-id="KeepCoverImage"
+                                               onchange="previewImage(event, 'CoverImagePreview')" />
+
+                                        <!-- Clear button for input -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearCoverImage">
+                                            @Localizer["Clear"]
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <img id="CoverImagePreview"
+                                             src="@(!string.IsNullOrEmpty(Model.CoverImageUrl) ? @Url.Content($"~/images/Categories/{Model.CoverImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                             alt="Cover Image"
+                                             class="img-fluid rounded shadow"
+                                             style="max-width: 100%; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                    <span asp-validation-for="CoverImage" id="coverImageError" class="text-danger"></span>
+                                    <input type="hidden" asp-for="CoverImageUrl" value="@Model.CoverImageUrl" />
+
+                                    <!-- Hidden input to track whether to keep the image -->
+                                    <input type="hidden" id="KeepCoverImage" asp-for="@Model.KeepCoverImage" value="true" />
+                                </div>
+
+                                <!-- Featured Image Section -->
+                                <div class="col-md-6">
+                                    <label class="form-label">@Localizer["Featured image"]</label>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <input asp-for="FeaturedImage"
+                                               type="file"
+                                               class="form-control"
+                                               id="FeaturedImage"
+                                               accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                               data-hidden-input-id="KeepFeaturedImage"
+                                               onchange="previewImage(event, 'FeaturedImagePreview')" />
+
+                                        <!-- Clear button for input -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearFeaturedImage">
+                                            @Localizer["Clear"]
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <img id="FeaturedImagePreview"
+                                             src="@(!string.IsNullOrEmpty(Model.FeaturedImageUrl) ? @Url.Content($"~/images/Categories/{Model.FeaturedImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                             alt="Featured Image"
+                                             class="img-fluid rounded shadow"
+                                             style="max-width: 100%; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                    <span asp-validation-for="FeaturedImage" id="featuredImageError" class="text-danger"></span>
+                                    <input type="hidden" asp-for="FeaturedImageUrl" value="@Model.FeaturedImageUrl" />
+
+                                    <!-- Hidden input to track whether to keep the image -->
+                                    <input asp-for="@Model.KeepFeaturedImage" type="hidden" id="KeepFeaturedImage" value="true" />
+                                </div>
+                            </div>
+
+
+
+                            <!-- Type of Sorting -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Type of sorting"]</label>
+                                <select asp-for="TypeOfSorting" asp-items="Model.SortingTypes" class="form-select"></select>
+                                <span asp-validation-for="TypeOfSorting" class="text-danger"></span>
+                            </div>
+
+                            <!-- Order -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Order"]</label>
+                                <input asp-for="Order" type="number" class="form-control" />
+                                <span asp-validation-for="Order" class="text-danger"></span>
+                            </div>
+
+
+                            <!-- Theme -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Theme"]</label>
+                                <select asp-for="ThemeId" asp-items="Model.Themes" class="form-select"></select>
+                                <span asp-validation-for="ThemeId" class="text-danger"></span>
+                            </div>
+
+                            <!-- Link -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Link to :"]</label>
+                                <input asp-for="Link" class="form-control" />
+                                <span asp-validation-for="Link" class="text-danger"></span>
+                            </div>
+
+
+                            <!-- Meta Description -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Description"]</label>
+                                <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Meta Keywords -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Keywords"]</label>
+                                <textarea asp-for="MetaKeywords" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaKeywords" class="text-danger"></span>
+                            </div>
+
+                            <!-- Gallery Style -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Gallery style"]</label>
+                                <select asp-for="GalleryStyle" asp-items="Model.GalleryStyles" class="form-select"></select>
+                                <span asp-validation-for="GalleryStyle" class="text-danger"></span>
+                            </div>
+
+                            <!--Gallery Images-->
+                            <div class="col-md-12">
+                                <div id="myDropzone" class="dropzone">
+                                    <div id="sortablePreviews"></div>
+                                </div>
+                            </div>
+
+                            <!-- Is Published -->
+                            <div class="col-lg-12">
+                                <div class="form-check">
+                                    <input asp-for="IsPublished" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish ?"]</label>
+                                </div>
+                                <span asp-validation-for="IsPublished" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    var existingGalleryImages = Model.ExistingGalleryImages;
+}
+
+@section Scripts {
+    <script src="~/CMS/lib/dropzone/dropzone.min.js"></script>
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+    <script>
+        var existingGalleryImages = @Html.Raw(Json.Serialize(existingGalleryImages));
+         var currentLanguage = '@CultureInfo.CurrentCulture.Name';
+    </script>
+
+    <script src="~/CMS/js/categoryForm.js"></script>
+}

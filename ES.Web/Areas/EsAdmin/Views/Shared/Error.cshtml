@@ -1,0 +1,30 @@
+﻿@using ES.Web.Areas.EsAdmin.Models
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="card radius-10 shadow-lg p-4 my-5 animate__animated animate__fadeIn">
+    <div class="row g-0 align-items-center">
+        <div class="col-xl-5 p-4">
+            <div class="card-body">
+                <h1 class="display-1 fw-bold text-danger">@Model.ErrorCode</h1>
+                <h2 class="display-5 fw-semibold text-dark mt-3">@Model.ErrorDescription</h2>
+                <p class="text-muted mt-4">
+                    We're sorry, something went wrong. Please try again later or contact support if the issue persists.
+                </p>
+                <div class="mt-5 d-flex flex-wrap gap-3">
+                    <a href="/" class="btn btn-lg btn-primary px-md-5 radius-30 shadow-sm">
+                        Go Home
+                    </a>
+                    <button onclick="window.history.back();" class="btn btn-lg btn-outline-secondary px-md-5 radius-30 shadow-sm">
+                        Back
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-7 text-center">
+            <img src="~/assets/images/error/505-error.png" class="img-fluid rounded-end" alt="Error illustration">
+        </div>
+    </div>
+</div>

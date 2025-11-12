@@ -1,0 +1,75 @@
+﻿@model PageViewModel
+
+
+<div class="col-md-12">
+    <!--gallery-->
+    <div class="gallery-wrapper">
+        <div class="content">
+            <div class="gallery full">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        
+                            @foreach(var img in Model.GalleryImages!)
+                        {
+                            <div class="swiper-slide">
+                                <div class="image">
+                                    <img src="~/images/Pages/GalleryImages/@img.GalleryImageUrl" alt="@img.GalleryImageAltName" />
+                                </div>
+
+                                @* <div class="overlay">
+                                    <div class="text-wrap">
+                                        <div class="name">
+                                            <span>Thumbnail Gallery</span>
+                                        </div>
+                                        <div class="caption">
+                                            <p>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quasi aliquam eius, blanditiis quae, explicabo praesentium corporis tempora quam et rem nulla repellendus placeat, nisi omnis earum sunt suscipit aspernatur!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div> *@
+                            </div>
+
+                            }
+
+                       
+                    </div>
+                </div>
+
+                <div class="swiper-next-button">
+                    <em class="material-icons">chevron_right</em>
+                </div>
+                <div class="swiper-prev-button">
+                    <em class="material-icons">chevron_left</em>
+                </div>
+            </div>
+
+            <div class="gallery thumb">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        @foreach (var img in Model.GalleryImages!)
+                        {
+                            <div class="swiper-slide">
+                                <div class="image">
+                                    <img src="~/images/Pages/GalleryImages/@img.GalleryImageUrl" alt="@img.GalleryImageAltName" />
+
+                                    <div class="overlay">
+                                        <em class="material-icons">remove_red_eye</em>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                    </div>
+                </div>
+
+                <div class="swiper-next-button">
+                    <em class="material-icons">arrow_right_alt</em>
+                </div>
+                <div class="swiper-prev-button">
+                    <em class="material-icons">arrow_right_alt</em>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

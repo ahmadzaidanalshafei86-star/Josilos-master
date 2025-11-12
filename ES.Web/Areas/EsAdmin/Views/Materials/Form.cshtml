@@ -1,0 +1,86 @@
+﻿@model MaterialFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Material"];
+}
+
+@section Styles {
+    <link href="~/CMS/lib/dropzone/dropzone.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @((Model.Id > 0)
+                                                ? Localizer["Edit material"]
+                                                : Localizer["Add material"])
+                    </h6>
+                    <hr>
+                    <form id="my-Form" method="post" enctype="multipart/form-data" asp-controller="Materials">
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+                        <div class="row g-3">
+
+                            <!-- material Name -->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Material name"]</label>
+                                <input asp-for="Name" class="form-control"
+                                       disabled="@(Model.Name == "Home Slider" ? "disabled" : null)" />
+
+                                @if (Model.Name == "Home Slider")
+                                {
+                                    <input type="hidden" asp-for="Name" />
+                                }
+
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                           
+
+                            
+
+                         
+
+                         
+
+
+
+                          
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="~/CMS/lib/dropzone/dropzone.min.js"></script>
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+    <script>
+       
+         var currentLanguage = '@CultureInfo.CurrentCulture.Name';
+    </script>
+
+    <script src="~/CMS/js/materialForm.js"></script>
+}

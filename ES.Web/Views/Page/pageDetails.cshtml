@@ -1,0 +1,382 @@
+﻿@model PageViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+
+@section Styles {
+    <!-- gallery -->
+    <link href="~/WebSite/assets/css/tipsy.css" rel="stylesheet" type="text/css" media="all">
+    <link href="~/WebSite/assets/css/litebox-home.css" rel="stylesheet" type="text/css" media="all">
+}
+
+<!--Title and breadCramp-->
+
+
+<div class="caption-inner">
+
+    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+
+    {
+
+
+
+
+
+        <div class="inner-bg" style="background: url(@Url.Content("~/images/Pages/" + Model.CoverImageUrl)) no-repeat fixed center center;"></div>
+
+
+
+    }
+
+    else
+    {
+
+        <div class="inner-bg" style="background: url(WebSite/images/header2.jpg) no-repeat fixed center center;"></div>
+
+    }
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="~/">@Localizer["Home"]</a></li>
+
+
+
+                    <li class="active">@Model.Title</li>
+                </ol>
+                <h3><span>@Model.Title</span></h3>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="content-inner wow fadeInUp  animated" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+
+             @*    @if (!string.IsNullOrEmpty(Model.FeaturedImageUrl))
+                {
+                    <div class="pic-inner">
+                        <img alt="@Model.FeaturedImageAltName" src="~/images/Pages/@Model.FeaturedImageUrl" class="img-responsive" />
+                    </div>
+                } *@
+
+                <!--Contact us form-->
+                @if (Model.HaveForm && Model.PageForm.Id == 2)
+                {
+                    <div class="row">
+                        <div class="col-md-8">
+                            @if (TempData["SuccessMessage"] != null)
+                            {
+                                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                            }
+
+                            <form asp-action="Apply" method="post" enctype="multipart/form-data">
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="formId" value="@Model.PageForm.Id" />
+                                <input type="hidden" name="PageSlug" value="@Model.Slug" />
+                                <div class="bg-white">
+                                    <div class="title">
+                                        @Model.PageForm?.Title
+                                    </div>
+                                    <div>@Model.PageForm?.Description</div>
+
+                                    <div style="margin-top:30px;">
+
+                                        <div class="row">
+                                            @foreach (var field in Model.PageForm!.Fields.OrderBy(f => f.Order))
+                                            {
+                                                @if (field.FieldType == "text" || field.FieldType == "email" || field.FieldType == "phoneNumber")
+                                                {
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            @if (field.FieldType == "text")
+                                                            {
+                                                                <input type="text" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "") />
+                                                            }
+                                                            else if (field.FieldType == "phoneNumber")
+                                                            {
+                                                                <input type="number" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" pattern="(\+?[1-9]{1}[0-9]{1,3})?[0-9]{7,15}" @(field.IsRequired ? "required" : "") />
+                                                            }
+                                                            else if (field.FieldType == "email")
+                                                            {
+                                                                <input type="email" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "") />
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="row">
+                                            @foreach (var field in Model.PageForm.Fields.OrderBy(f => f.Order))
+                                            {
+                                                @if (field.FieldType == "textarea")
+                                                {
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            <textarea name="@field.FieldName" class="form-control" rows="5" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "")></textarea>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (field.FieldType == "select")
+                                                {
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            <select name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "")>
+                                                                <option value="">Select an option</option>
+                                                                @foreach (var option in field.Options.OrderBy(o => o.Order))
+                                                                {
+                                                                    <option value="@option.OptionText">@option.OptionText</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (field.FieldType == "checkbox")
+                                                {
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            @foreach (var option in field.Options.OrderBy(o => o.Order))
+                                                            {
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" name="@field.FieldName" value="@option.OptionText" class="form-check-input" id="@(field.FieldName)_@option.Id" />
+                                                                    <label class="form-check-label" for="@(field.FieldName)_@option.Id">@option.OptionText</label>
+                                                                </div>
+                                                            }
+                                                            @if (field.IsRequired)
+                                                            {
+                                                                <input type="hidden" name="@field.FieldName" value="" class="checkbox-validator" />
+                                                                <small class="text-danger" style="display:none;">Please select at least one option.</small>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (field.FieldType == "file")
+                                                {
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            <div class="text-center" style="color:#229fa6;">@field.FieldHint</div>
+                                                            <input type="file" name="@field.FieldName" class="form-control" style="padding: 10px; background-color: whitesmoke; border-radius: 5px; width: 100%;" @(field.IsRequired ? "required" : "") />
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (field.FieldType == "rating")
+                                                {
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            <select name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "")>
+                                                                <option value="">Rate (1-5)</option>
+                                                                @for (int i = 1; i <= 5; i++)
+                                                                {
+                                                                    <option value="@i">@i</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else if (field.FieldType == "date")
+                                                {
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                                            <input type="date" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+
+                                    </div>
+                                    <button type="submit" class="btn-header green-button btn-more">@Localizer["send a message"]</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        @Html.Raw(Model.LongDescription)
+                    </div>
+
+                }
+                else
+                {
+                    @Html.Raw(Model.LongDescription)
+                }
+
+            </div>
+
+            @if (Model.GalleryImages?.Count() > 0)
+            {
+                @await Html.PartialAsync($"_{Model.GalleryStyle}", Model)
+            }
+        </div>
+    </div>
+
+</div>
+
+
+@if (Model.HaveForm && Model.PageForm.Id != 2)
+{
+    <!--Forms-->
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            <form asp-action="Apply" method="post" enctype="multipart/form-data" style="margin-top:30px;">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="formId" value="@Model.PageForm.Id" />
+                <input type="hidden" name="PageSlug" value="@Model.Slug" />
+                <div class="bg-white">
+                    <div class="title">
+                        @Model.PageForm?.Title
+                    </div>
+                    <div>@Model.PageForm?.Description</div>
+
+                    <div style="margin-top:30px;">
+
+                        <div class="row">
+                            @foreach (var field in Model.PageForm!.Fields.OrderBy(f => f.Order))
+                            {
+                                @if (field.FieldType == "text" || field.FieldType == "email" || field.FieldType == "phoneNumber")
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            @if (field.FieldType == "text")
+                                            {
+                                                <input type="text" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "") />
+                                            }
+                                            else if (field.FieldType == "phoneNumber")
+                                            {
+                                                <input type="number" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" pattern="(\+?[1-9]{1}[0-9]{1,3})?[0-9]{7,15}" @(field.IsRequired ? "required" : "") />
+                                            }
+                                            else if (field.FieldType == "email")
+                                            {
+                                                <input type="email" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "") />
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="row">
+                            @foreach (var field in Model.PageForm.Fields.OrderBy(f => f.Order))
+                            {
+                                @if (field.FieldType == "textarea")
+                                {
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            <textarea name="@field.FieldName" class="form-control" rows="5" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "")></textarea>
+                                        </div>
+                                    </div>
+                                }
+                                else if (field.FieldType == "select")
+                                {
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            <select name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "")>
+                                                <option value="">Select an option</option>
+                                                @foreach (var option in field.Options.OrderBy(o => o.Order))
+                                                {
+                                                    <option value="@option.OptionText">@option.OptionText</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                else if (field.FieldType == "checkbox")
+                                {
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            @foreach (var option in field.Options.OrderBy(o => o.Order))
+                                            {
+                                                <div class="form-check">
+                                                    <input type="checkbox" name="@field.FieldName" value="@option.OptionText" class="form-check-input" id="@(field.FieldName)_@option.Id" />
+                                                    <label class="form-check-label" for="@(field.FieldName)_@option.Id">@option.OptionText</label>
+                                                </div>
+                                            }
+                                            @if (field.IsRequired)
+                                            {
+                                                <input type="hidden" name="@field.FieldName" value="" class="checkbox-validator" />
+                                                <small class="text-danger" style="display:none;">Please select at least one option.</small>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else if (field.FieldType == "file")
+                                {
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            <div class="text-center" style="color:#229fa6;">@field.FieldHint</div>
+                                            <input type="file" name="@field.FieldName" class="form-control" style="padding: 10px; background-color: whitesmoke; border-radius: 5px; width: 100%;" @(field.IsRequired ? "required" : "") />
+                                        </div>
+                                    </div>
+                                }
+                                else if (field.FieldType == "rating")
+                                {
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            <select name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "")>
+                                                <option value="">Rate (1-5)</option>
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                else if (field.FieldType == "date")
+                                {
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                            <input type="date" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        </div>
+                        <button type="submit" class="btn-header green-button btn-more">@Localizer["send a message"]</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+
+}
+
+@section Plugins {
+    <script src="~/WebSite/assets/js/tipsy.min.js" type="text/javascript"></script>
+    <script src="~/WebSite/assets/js/backbone.js" type="text/javascript"></script>
+    <script src="~/WebSite/assets/js/litebox.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $('.litebox').liteBox();
+    </script>
+}

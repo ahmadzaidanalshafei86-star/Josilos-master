@@ -1,0 +1,75 @@
+﻿@model IList<SocialMediaLink>
+
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@using System.Globalization
+
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
+@{
+    var currentCulture = CultureInfo.CurrentCulture.Name;
+    var supportedCultures = LocOptions.Value.SupportedUICultures;
+    var returnUrl = Url.Content("~") + Context.Request.Path + Context.Request.QueryString;
+
+    // Determine the culture to switch to (toggle between en-US and ar-JO)
+    string targetCulture = currentCulture == "en-JO" ? "ar-JO" : "en-JO";
+    // Display the opposite culture's name
+    string languageTitle = currentCulture == "en-JO" ? "عربي" : "English";
+    var path = Context.Request.Path.Value?.Trim('/').ToLower();
+    var isHome = string.IsNullOrEmpty(path);
+}
+
+<div class="socials">
+    <ul>
+
+
+        @foreach (var link in Model)
+        {
+            <li>
+                <a href="@link.Url" target="_blank" class="icon-circle">
+                    <i class="@link.IconClass" style="color: @(link.IconColor ?? "#ffffff");"></i>
+                </a>
+            </li>
+        }
+
+
+
+
+        <li class="language">
+            <a href="javascript:void(0)" onclick="submitLanguageToggle('@targetCulture', '@returnUrl')">
+               @*  <img alt="@languageTitle" src="@Url.Content($"~/WebSite/images/{languageTitle}.png")" /> *@
+                @languageTitle
+            </a>
+        </li>
+
+
+
+
+
+
+    </ul>
+
+    <!-- Hidden Form for Language Toggle -->
+    <form id="languageToggleForm"
+          method="post"
+          asp-controller="Language"
+          asp-action="SetLanguage"
+          style="display: none;">
+        <input type="hidden" name="culture" id="languageCulture" />
+        <input type="hidden" name="returnUrl" id="languageReturnUrl" />
+    </form>
+
+    <script>
+        function submitLanguageToggle(culture, returnUrl) {
+            document.getElementById('languageCulture').value = culture;
+            document.getElementById('languageReturnUrl').value = returnUrl;
+            document.getElementById('languageToggleForm').submit();
+        }
+    </script>
+</div>

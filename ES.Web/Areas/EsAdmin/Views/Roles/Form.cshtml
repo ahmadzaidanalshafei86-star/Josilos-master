@@ -1,0 +1,54 @@
+﻿@model RoleFormViewModel
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+
+@{
+    ViewData["Title"] = Localizer["Role"];
+}
+
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @(!string.IsNullOrEmpty(Model?.Id)
+                            ? Localizer["Edit"]
+                            : Localizer["Add"])
+                        @Localizer["Role"]
+                    </h6>
+                    <hr>
+                    <form method="post" asp-controller="Roles">
+                        @Html.AntiForgeryToken()
+                        @if (!string.IsNullOrEmpty(Model?.Id))
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+                        <div class="row g-3">
+                            <!-- Username -->
+                            <div class="col-md-6">
+                                <label for="inputUsername" class="form-label">@Localizer["Role name"]</label>
+                                <input type="text" id="inputUsername" class="form-control" placeholder=@Localizer["Enter role name"] asp-for="RoleName">
+                                <span asp-validation-for="RoleName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

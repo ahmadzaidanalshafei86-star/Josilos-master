@@ -1,0 +1,1059 @@
+﻿@model HomeViewModel
+@using ES.Web.Models.Client
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Text.RegularExpressions
+@inject IViewLocalizer Localizer
+
+
+
+
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Http.Features
+
+@using Microsoft.Extensions.Options
+@using System.Globalization
+
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
+@{
+    var currentCulture = CultureInfo.CurrentCulture.Name;
+    var supportedCultures = LocOptions.Value.SupportedUICultures;
+    var returnUrl = Url.Content("~") + Context.Request.Path + Context.Request.QueryString;
+
+    // Determine the culture to switch to (toggle between en-US and ar-JO)
+    string targetCulture = currentCulture == "en-JO" ? "ar-JO" : "en-JO";
+    // Display the opposite culture's name
+    string languageTitle = currentCulture == "en-JO" ? "عربي" : "English";
+    var path = Context.Request.Path.Value?.Trim('/').ToLower();
+    var isHome = string.IsNullOrEmpty(path);
+}
+
+@section Styles {
+    <link href="~/WebSite/carouselengine/initcarousel-1.css" rel="stylesheet" type="text/css">
+    <link href="~/WebSite/carouselengine/initcarousel-2.css" rel="stylesheet" type="text/css">
+
+    <!-- gallery -->
+    <link href="~/WebSite/assets/css/tipsy.css" rel="stylesheet" type="text/css" media="all">
+    <link href="~/WebSite/assets/css/litebox-home.css" rel="stylesheet" type="text/css" media="all">
+}
+
+
+<!--Main Slider-->
+@if (Model.MainSlider.Count > 0)
+{
+
+
+    <div id="myCarousel" class="carousel slide carousel-1" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @foreach (var slide in Model.MainSlider.Select((s, index) => new { Slide = s, Index = index }))
+            {
+                <button type="button"
+                        data-bs-target="#myCarousel"
+                        data-bs-slide-to="@slide.Index"
+                        class="@(slide.Index == 0 ? "active" : "")"
+                        aria-current="@(slide.Index == 0 ? "true" : "false")"
+                        aria-label="Slide @(slide.Index + 1)">
+                </button>
+            }
+        </div>
+        <div class="carousel-inner">
+
+            @foreach (var slide in Model.MainSlider.Select((s, index) => new { Slide = s, Index = index }))
+            {
+
+
+                <div class="carousel-item carousel-1 @(slide.Index == 0 ? "active" : "")">
+                    
+
+
+                    @if (!string.IsNullOrEmpty(slide.Slide.VideoUrl))
+                    {
+                        <div align="center" class="slider-video">
+                            <video class="video-fluid" autoplay loop muted>
+                                <source src="@slide.Slide.VideoUrl" type="video/mp4">
+                            </video>
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(slide.Slide.CoverImageUrl))
+                    {
+
+
+                        <img alt="" src='@Url.Content("~/images/Pages/" + slide.Slide.CoverImageUrl)' class="img-responsive">
+                        
+
+
+                    }
+
+
+
+                </div>
+
+
+
+              
+
+
+
+            }
+
+
+
+
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+
+
+
+
+
+        @if (Model.SliderArticles.Pages.Count > 0)
+        {
+            var colors = new[] { "color1", "color2", "color3", "color4", "color5", "color6", "color7", "color8", "color9" };
+            int index = 0;
+
+            <div class="icons wow fadeInUp animated" data-wow-delay=".2s"
+                 style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInUp ;">
+                <ul>
+                    @foreach (var item in Model.SliderArticles.Pages)
+                    {
+                        var colorClass = colors[index % colors.Length]; // pick color by index
+                                                                        <a href="@item.LinkUrl">
+                                                                        <li class="@colorClass">
+                                                                            <img alt="@item.FeaturedImageAltName" src="~/images/Pages/@item.FeaturedImageUrl" class="img-responsive">
+                                                                            <div class="text">@item.Title</div>
+                                                                        </li>
+                                                                        </a>
+
+                        index++; // increase index so next item gets the next color
+                    }
+                </ul>
+            </div>
+        }
+
+      
+
+
+    </div>
+
+    @if (Model.SliderArticles.Pages.Count > 0)
+
+
+
+    {
+
+        var colors = new[] { "color1", "color2", "color3", "color4", "color5", "color6", "color7", "color8", "color9" };
+        int index = 0;
+        <div class="icons icons-mobile wow fadeInUp animated" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInUp ;">
+            <ul>
+
+                @foreach (var item in Model.SliderArticles.Pages)
+                {
+                    var colorClass = colors[index % colors.Length]; // pick color by index
+                                                                    <a href="@item.LinkUrl">
+                                                                    <li class="@colorClass">
+                                                                        <img alt="@item.FeaturedImageAltName" src="~/images/Pages/@item.FeaturedImageUrl" class="img-responsive">
+                                                                        <div class="text">@item.Title</div>
+                                                                    </li>
+                                                                    </a>
+
+                    index++; // increase index so next item gets the next color
+                }
+
+
+
+
+
+
+
+
+            </ul>
+        </div>
+
+    }
+
+
+   
+}
+
+
+
+
+
+
+@if (Model.SliderArticles.Pages.Count > 0)
+
+
+
+{
+    <div class="icons icons-mobile wow fadeInUp animated" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInUp ;">
+        <ul>
+
+            @foreach (var item in Model.SliderArticles.Pages)
+            {
+
+                <a href="@item.LinkUrl">
+                <li class="color1">
+                    <img alt="@item.FeaturedImageAltName" src="~/images/Pages/@item.FeaturedImageUrl" class="img-responsive">
+                    <div class="text">@item.Title</div>
+                </li></a>
+
+            }
+
+
+
+
+
+
+
+
+        </ul>
+    </div>
+
+}
+
+@if (Model.NewsTicker.Pages.Count > 0)
+
+
+
+
+
+
+
+{
+
+    <div class="news-ticker">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="content2">
+                        <div class="container1">
+                            <div class="marquee">
+                                <ul class="marquee-content-items">
+
+
+                                    @foreach (var item in Model.NewsTicker.Pages)
+                                    {
+
+                                        <a href="@item.LinkUrl">
+
+                                        <li>@item.Title </li>
+
+
+                                       </a>
+
+                                    }
+                                   
+                                  
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+@if (Model.HomeWelcome.Pages.Count > 0)
+
+
+
+
+
+
+
+{
+    @if (Model.HomeWelcome.Pages.Count >= 3)
+    {
+    <div class="welcome">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-md-4 wow fadeInRight animated" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInRight ;">
+                    <img alt="@Model.HomeWelcome.Pages[0].FeaturedImageUrl" src="~/images/Pages/@Model.HomeWelcome.Pages[0].FeaturedImageUrl" class="img-responsive welcome-img">
+
+                </div>
+                <div class="col-md-4 wow fadeInUp animated" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInUp ;">
+                    <div class="title">
+                        <span>@Model.HomeWelcome.Pages[0].Title</span>
+                    </div>
+                
+
+                    <div class="welcome-text">
+
+                            @Html.Raw(Model.HomeWelcome.Pages[0].ShortDescription)
+                       
+                    </div>
+
+                        <div><a href="@Model.HomeWelcome.Pages[0].LinkUrl" class="btn-header btn-more">@Localizer["Read More"]</a></div>
+                </div>
+
+
+
+                <div class="col-md-4">
+
+                    <div class="box-style-all-new wow fadeInUp animated" data-wow-delay=".4s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInUp;">
+                        <div class="text-all-new">
+                                @Model.HomeWelcome.Pages[1].Title
+                            <span>
+
+                                    @Html.Raw(Model.HomeWelcome.Pages[1].ShortDescription)
+                                   
+                                </span>
+
+                        </div>
+
+                            <div class="box-style2-new container-img-new image-new" style="background-image:url(images/Pages/@Model.HomeWelcome.Pages[1].FeaturedImageUrl)">
+                                <a href="@Model.HomeWelcome.Pages[1].LinkUrl">
+                                <div class="overlay-new">
+                                        <div class="text-new">@Localizer["CV"]</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="box-style2-text-new">
+                                <div class="more-link-new"><a href="@Model.HomeWelcome.Pages[1].LinkUrl">@Localizer["CV"]</a></div>
+                        </div>
+
+                    </div>
+
+                    <div class="box-style-all-new wow fadeInUp animated" data-wow-delay=".4s" style="visibility: visible; animation-delay: 0.5s; animation-name: fadeInUp;">
+                        <div class="text-all-new">
+                                @Model.HomeWelcome.Pages[2].Title
+                            <span>
+
+
+                                    @Html.Raw(Model.HomeWelcome.Pages[2].ShortDescription)
+                                </span>
+
+                        </div>
+
+                            <div class="box-style2-new container-img-new image" style="background-image:url(images/Pages/@Model.HomeWelcome.Pages[2].FeaturedImageUrl)">
+                                <a href="@Model.HomeWelcome.Pages[2].LinkUrl">
+                                <div class="overlay-new">
+                                        <div class="text-new">@Localizer["CV"]</div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="box-style2-text-new">
+                                <div class="more-link-new"><a href="@Model.HomeWelcome.Pages[2].LinkUrl">@Localizer["CV"]</a></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    }
+}
+
+
+@if (Model.HomeProducts.Pages.Count > 0)
+
+
+
+
+
+{
+
+    <div class="products">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="title-headline text-center">
+                        @Model.HomeProducts.Name
+                        <span>
+
+                            @Html.Raw(Model.HomeProducts.ShortDescription)
+                            
+                        </span>
+                    </div>
+
+                    <!-- partial:index.partial.html -->
+                    <div id="carouselExampleControls" class="carousel carousel-2 slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="cards-wrapper">
+
+                                    
+    @if (Model.HomeProducts.Pages.Count > 0)
+
+
+    {
+                                    <div class="card">
+                                        <div class="products-all">
+                                            <a href="">
+                                                <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[0].FeaturedImageUrl')"></div>
+                                                <div class="products-style-text">
+                                                    <div class="text-products">
+                                                        @Model.HomeProducts.Pages[0].Title
+                                                    </div>
+                                                    <a href="@Model.HomeProducts.Pages[0].LinkUrl">
+                                                            <div class="more-link">@Localizer["Read More"] <i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                    </a>
+                                                </div>
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                  }
+
+                        
+
+                                    @if (Model.HomeProducts.Pages.Count > 1)
+
+
+                                    {
+                                        <div class="card">
+                                            <div class="products-all">
+                                                <a href="">
+                                                    <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[1].FeaturedImageUrl')"></div>
+                                                    <div class="products-style-text">
+                                                        <div class="text-products">
+                                                            @Model.HomeProducts.Pages[1].Title
+                                                        </div>
+                                                        <a href="@Model.HomeProducts.Pages[1].LinkUrl">
+                                                            <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                        </a>
+                                                    </div>
+                                                </a>
+
+                                            </div>
+                                        </div>
+                                    }
+
+
+
+
+                                    @if (Model.HomeProducts.Pages.Count > 2)
+
+
+                                    {
+                                        <div class="card">
+                                            <div class="products-all">
+                                                <a href="">
+                                                    <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[2].FeaturedImageUrl')"></div>
+                                                    <div class="products-style-text">
+                                                        <div class="text-products">
+                                                            @Model.HomeProducts.Pages[2].Title
+                                                        </div>
+                                                        <a href="@Model.HomeProducts.Pages[2].LinkUrl">
+                                                            <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                        </a>
+                                                    </div>
+                                                </a>
+
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @if (Model.HomeProducts.Pages.Count > 3)
+
+
+                            {
+
+                                <div class="carousel-item">
+                                    <div class="cards-wrapper">
+
+
+                                        @if (Model.HomeProducts.Pages.Count > 3)
+
+
+                                        {
+                                            <div class="card">
+                                                <div class="products-all">
+                                                    <a href="">
+                                                        <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[3].FeaturedImageUrl')"></div>
+                                                        <div class="products-style-text">
+                                                            <div class="text-products">
+                                                                @Model.HomeProducts.Pages[3].Title
+                                                            </div>
+                                                            <a href="@Model.HomeProducts.Pages[3].LinkUrl">
+                                                                <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                            </a>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        }
+
+
+
+                                        @if (Model.HomeProducts.Pages.Count > 4)
+
+
+                                        {
+                                            <div class="card">
+                                                <div class="products-all">
+                                                    <a href="">
+                                                        <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[4].FeaturedImageUrl')"></div>
+                                                        <div class="products-style-text">
+                                                            <div class="text-products">
+                                                                @Model.HomeProducts.Pages[4].Title
+                                                            </div>
+                                                            <a href="@Model.HomeProducts.Pages[4].LinkUrl">
+                                                                <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                            </a>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        }
+
+
+
+
+                                        @if (Model.HomeProducts.Pages.Count > 5)
+
+
+                                        {
+                                            <div class="card">
+                                                <div class="products-all">
+                                                    <a href="">
+                                                        <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[5].FeaturedImageUrl')"></div>
+                                                        <div class="products-style-text">
+                                                            <div class="text-products">
+                                                                @Model.HomeProducts.Pages[5].Title
+                                                            </div>
+                                                            <a href="@Model.HomeProducts.Pages[5].LinkUrl">
+                                                                <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                            </a>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+
+                            }
+                            @if (Model.HomeProducts.Pages.Count > 6)
+
+
+                            {
+
+                                <div class="carousel-item">
+                                    <div class="cards-wrapper">
+
+
+                                        @if (Model.HomeProducts.Pages.Count > 6)
+
+
+                                        {
+                                            <div class="card">
+                                                <div class="products-all">
+                                                    <a href="">
+                                                        <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[6].FeaturedImageUrl')"></div>
+                                                        <div class="products-style-text">
+                                                            <div class="text-products">
+                                                                @Model.HomeProducts.Pages[6].Title
+                                                            </div>
+                                                            <a href="@Model.HomeProducts.Pages[6].LinkUrl">
+                                                                <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                            </a>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        }
+
+
+
+                                        @if (Model.HomeProducts.Pages.Count > 7)
+
+
+                                        {
+                                            <div class="card">
+                                                <div class="products-all">
+                                                    <a href="">
+                                                        <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[7].FeaturedImageUrl')"></div>
+                                                        <div class="products-style-text">
+                                                            <div class="text-products">
+                                                                @Model.HomeProducts.Pages[7].Title
+                                                            </div>
+                                                            <a href="@Model.HomeProducts.Pages[7].LinkUrl">
+                                                                <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                            </a>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        }
+
+
+
+
+                                        @if (Model.HomeProducts.Pages.Count > 8)
+
+
+                                        {
+                                            <div class="card">
+                                                <div class="products-all">
+                                                    <a href="">
+                                                        <div class="products-style" style="background-image:url('images/Pages/@Model.HomeProducts.Pages[8].FeaturedImageUrl')"></div>
+                                                        <div class="products-style-text">
+                                                            <div class="text-products">
+                                                                @Model.HomeProducts.Pages[8].Title
+                                                            </div>
+                                                            <a href="@Model.HomeProducts.Pages[8].LinkUrl">
+                                                                <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                            </a>
+                                                        </div>
+                                                    </a>
+
+                                                </div>
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+
+                            }
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="col-md-12 text-center">
+                    <div><a href="Categories/@Model.HomeProducts.Slug" class="btn-header btn-more">@Localizer["More Products"]</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+@if (Model.HomeServices.Pages.Count > 0)
+
+
+
+{
+
+    <div class="services">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="title-headline text-center">
+                        @Model.HomeServices.Name
+                        <span>
+
+                            @Html.Raw(Model.HomeServices.ShortDescription)
+
+                        </span>
+                    </div>
+
+
+                    <!-- Insert to your webpage where you want to display the carousel -->
+                    <div id="amazingcarousel-container-4">
+                        <div id="amazingcarousel-4" style="display:none;position:relative;width:100%;max-width:1500px;margin:0px auto 0px;">
+                            <div class="amazingcarousel-list-container">
+                                <ul class="amazingcarousel-list">
+
+                                    @foreach (var item in Model.HomeServices.Pages)
+                                    {
+
+
+                                        <li class="amazingcarousel-item">
+                                            <a href="@item.LinkUrl">
+                                            <div class="amazingcarousel-item-container">
+                                                <div class="amazingcarousel-image">
+                                                    <div class="servics-box-small">
+                                                        <img alt="" src="images/Pages/@item.FeaturedImageUrl" class="img-responsive">
+                                                        <div class="h2">@item.Title </div>
+
+
+                                                            <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </a>
+                                        </li>
+
+                                       
+
+                                    }
+
+
+
+
+
+                                
+
+
+
+                                </ul>
+                                <div class="amazingcarousel-prev"></div>
+                                <div class="amazingcarousel-next"></div>
+                            </div>
+
+                            <div class="amazingcarousel-engine"><a href="http://amazingcarousel.com">JavaScript Scroller</a></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+}
+
+
+@if (Model.HomeNews.Pages.Count > 0)
+
+
+
+
+
+
+
+{
+
+
+
+    <div class="news">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="title-headline text-center">
+                        @Model.HomeNews.Name
+                        <span>
+
+                            @Html.Raw(Model.HomeNews.ShortDescription)
+
+                        </span>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3">
+
+                            <div class="container-calendar">
+                                <div style="
+        text-align: center;
+        text-decoration: none;
+        padding-bottom: 25px;
+        color: white;
+    ">
+                                    <a href="#" style="
+
+        background-color: #032241;
+        border: 1px solid black;
+        padding: 9px;    border-radius: 3px;
+        color: white; font-size: 14px;
+    ">الفعاليات السنوية</a>
+
+                                    <a style="
+
+        background-color: #032241;
+        border: 1px solid black;
+        padding: 9px;font-size: 14px;
+        color: white; border-radius: 3px;
+    " href="#">الفعاليات القادمة</a>
+                                </div>
+
+
+
+                                <script type="text/javascript">
+                                    //<![CDATA[
+                                    Sys.WebForms.PageRequestManager._initialize('ctl00$ContentPlaceHolder1$ScriptManager1', 'mform', ['tctl00$ContentPlaceHolder1$CalendarPanel','ContentPlaceHolder1_CalendarPanel'], [], [], 90, 'ctl00');
+                                    //]]>
+                                </script>
+
+                                <div id="ContentPlaceHolder1_CalendarPanel">
+
+                                    <table id="ContentPlaceHolder1_Calendar1" class="myCalendar" cellspacing="0" cellpadding="0" title="Calendar" style="border-width:1px;border-style:solid;border-collapse:collapse;border-width: 0px;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="7" style="background-color:Silver;">
+                                                    <table class="myCalendarTitle" cellspacing="0" style="width:100%;border-collapse:collapse;">
+                                                        <tbody>
+                                                            <tr><td class="myCalendarNextPrev" style="width:15%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','V9344')" style="color:Black" title="Go to the previous month">.</a></td><td align="center" style="width:70%;">أيلول 2025</td><td class="myCalendarNextPrev" align="right" style="width:15%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','V9405')" style="color:Black" title="Go to the next month">.</a></td></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr><th class="myCalendarDayHeader" align="center" abbr="السبت" scope="col">السبت</th><th class="myCalendarDayHeader" align="center" abbr="الأحد" scope="col">الأحد</th><th class="myCalendarDayHeader" align="center" abbr="الإثنين" scope="col">الإثنين</th><th class="myCalendarDayHeader" align="center" abbr="الثلاثاء" scope="col">الثلاثاء</th><th class="myCalendarDayHeader" align="center" abbr="الأربعاء" scope="col">الأربعاء</th><th class="myCalendarDayHeader" align="center" abbr="الخميس" scope="col">الخميس</th><th class="myCalendarDayHeader" align="center" abbr="الجمعة" scope="col">الجمعة</th></tr>
+                                            <tr><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9373')" style="color:Black" title="30 آب">30</a></td><td title="انقر هنا لمشاهدة اخبار وأحداث هذا اليوم" class="events" align="center" onclick="window.location='View_Articlear.aspx?type=1&amp;Ic=1&amp;ID=5&amp;name=&amp;date=2025-08-31&amp;keyword='" style="width:14%;cursor:pointer;">31</td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9375')" style="color:Black" title="01 أيلول">1</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9376')" style="color:Black" title="02 أيلول">2</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9377')" style="color:Black" title="03 أيلول">3</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9378')" style="color:Black" title="04 أيلول">4</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9379')" style="color:Black" title="05 أيلول">5</a></td></tr>
+                                            <tr><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9380')" style="color:Black" title="06 أيلول">6</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9381')" style="color:Black" title="07 أيلول">7</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9382')" style="color:Black" title="08 أيلول">8</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9383')" style="color:Black" title="09 أيلول">9</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9384')" style="color:Black" title="10 أيلول">10</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9385')" style="color:Black" title="11 أيلول">11</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9386')" style="color:Black" title="12 أيلول">12</a></td></tr>
+                                            <tr><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9387')" style="color:Black" title="13 أيلول">13</a></td><td class="myCalendarToday" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9388')" style="color:Black" title="14 أيلول">14</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9389')" style="color:Black" title="15 أيلول">15</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9390')" style="color:Black" title="16 أيلول">16</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9391')" style="color:Black" title="17 أيلول">17</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9392')" style="color:Black" title="18 أيلول">18</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9393')" style="color:Black" title="19 أيلول">19</a></td></tr>
+                                            <tr><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9394')" style="color:Black" title="20 أيلول">20</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9395')" style="color:Black" title="21 أيلول">21</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9396')" style="color:Black" title="22 أيلول">22</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9397')" style="color:Black" title="23 أيلول">23</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9398')" style="color:Black" title="24 أيلول">24</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9399')" style="color:Black" title="25 أيلول">25</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9400')" style="color:Black" title="26 أيلول">26</a></td></tr>
+                                            <tr><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9401')" style="color:Black" title="27 أيلول">27</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9402')" style="color:Black" title="28 أيلول">28</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9403')" style="color:Black" title="29 أيلول">29</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9404')" style="color:Black" title="30 أيلول">30</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9405')" style="color:Black" title="01 تشرين&nbsp;الأول">1</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9406')" style="color:Black" title="02 تشرين&nbsp;الأول">2</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9407')" style="color:Black" title="03 تشرين&nbsp;الأول">3</a></td></tr>
+                                            <tr><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9408')" style="color:Black" title="04 تشرين&nbsp;الأول">4</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9409')" style="color:Black" title="05 تشرين&nbsp;الأول">5</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9410')" style="color:Black" title="06 تشرين&nbsp;الأول">6</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9411')" style="color:Black" title="07 تشرين&nbsp;الأول">7</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9412')" style="color:Black" title="08 تشرين&nbsp;الأول">8</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9413')" style="color:Black" title="09 تشرين&nbsp;الأول">9</a></td><td class="myCalendarDay" align="center" style="width:14%;"><a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Calendar1','9414')" style="color:Black" title="10 تشرين&nbsp;الأول">10</a></td></tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3" style="display:none">
+                            <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+                            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+
+
+                            <script>
+                                $(document).ready(function() {
+                                    var calendarEl = document.getElementById('calendar');
+
+                                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                                        initialView: 'dayGridMonth',
+                                        locale: 'ar',
+                                        direction: 'rtl',
+                                        headerToolbar: {
+                                            left: 'prev,next today',
+                                            center: 'title',
+                                            right: ''
+                                        },
+                                        dayMaxEvents: true,
+                                        events: [
+                                            @foreach (var item in Model.HomeNews.Pages)
+                                            {
+                                                    if (item.DateInput.HasValue)
+                                                    {
+                                                            <text>
+                                                            {
+                                                                title: "@item.LinkUrl",
+                                                                start: "@item.DateInput.Value.ToString("yyyy-MM-dd")",
+                                                                url: "@item.LinkUrl"
+                                                            },
+                                                            </text>
+                                                    }
+                                            }
+                                        ],
+                                        eventClick: function(info) {
+                                            window.location.href = info.event.url;
+                                            info.jsEvent.preventDefault();
+                                        }
+                                    });
+
+                                    calendar.render();
+                                });
+                            </script>
+
+                            <style>
+
+                            /* الحاوية العامة للتقويم */
+.calender {
+    background-color: #c6b086;  
+    padding: 50px 15px;
+}
+
+/* الروابط في header */
+.fc .fc-toolbar-title {
+    font-weight: bold;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-family: verdana;
+    background-color: #e5b60d;
+    color: #fff;
+    padding: 5px 0;
+    text-align: center;
+}
+
+/* أزرار السابق / التالي */
+.fc .fc-prev-button,
+.fc .fc-next-button,
+.fc .fc-today-button {
+    color: #4CCAEF;
+    background: none;
+    border: none;
+}
+.fc .fc-prev-button:hover,
+.fc .fc-next-button:hover,
+.fc .fc-today-button:hover {
+    background-color: transparent;
+}
+
+/* رؤوس الأيام */
+.fc .fc-col-header-cell {
+    height: 35px;
+    color: #000000;
+    text-align: center;
+    font-weight: bold;
+    font-size: 10px;
+    background-color: #f0f0f0;
+}
+
+/* الأيام العادية */
+.fc .fc-daygrid-day {
+    background-color: #fff;
+    position: relative;
+}
+
+/* اليوم الحالي */
+.fc .fc-day-today {
+    background-color: #3485aa;
+    color: #fff;
+}
+
+/* رابط اليوم */
+.fc .fc-daygrid-day a {
+    display: block;
+    text-decoration: none;
+    line-height: 42px;
+    color: #3485aa;
+    text-align: center;
+}
+
+/* hover */
+.fc .fc-daygrid-day:hover {
+    background-color: #3485aa;
+    color: #fff;
+}
+
+/* الأيام الخاصة بالأحداث */
+.fc-event {
+    background-color: rgb(206, 219, 247);
+    color: #fff;
+    border: none;
+    padding: 2px 5px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+/* عند hover على الحدث */
+.fc-event:hover {
+    background-color: #3485aa;
+    color: #fff;
+}
+
+
+                            </style>
+                           <div class="calendar-wrapper">
+    <div class="calendar-buttons">
+                                    <button class="btn btn-dark">@Localizer["Annual Events"]</button>
+                                    <button class="btn btn-dark">@Localizer["Upcoming Events"]</button>
+    </div>
+    <div id="calendar"></div>
+</div>
+
+
+                        </div>
+
+
+
+
+                        <div class="col-lg-9">
+                            <ul>
+
+
+
+                                @foreach (var item in Model.HomeNews.Pages)
+                                {
+                                  
+
+                                    <a href="@item.LinkUrl">
+                                    <li class="wow fadeInUp animated" data-wow-delay=".2s" style="animation-delay: 0.2s; animation-name: none;">
+                                        <img alt="" src="images/Pages/@item.FeaturedImageUrl" class="img-responsive">
+                                        <div class="date-time">
+                                            @item.DateInput.Value.ToString("dd")
+                                            <span>@item.DateInput.Value.ToString("MMM")</span>
+                                        </div>
+                                        <div class="text">
+                                            <div class="text-news">
+                                                @item.Title
+                                         
+                                            
+                                            </div>
+                                            <div class="text-inner">
+                                               
+                                                @Html.Raw(item.ShortDescription)
+                                            
+                                            </div>
+                                            <div class="more-link">@Localizer["Read More"]<i class="fas @(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "fa-arrow-left" : "fa-arrow-right")"></i></div>
+                                        </div>
+                                    </li>
+                                    </a>
+
+                                }
+
+
+
+
+                                
+
+                            </ul>
+
+                        </div>
+                       
+                    </div>
+
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+@section Plugins {
+    <script src="~/WebSite/carouselengine/jquery.js"></script>
+    <script src="~/WebSite/carouselengine/amazingcarousel.js"></script>
+    <script src="~/WebSite/carouselengine/initcarousel-2.js"></script>
+    <script src="~/WebSite/carouselengine/initcarousel-1.js"></script>
+
+    <script src="~/WebSite/assets/js/tipsy.min.js" type="text/javascript"></script>
+    <script src="~/WebSite/assets/js/backbone.js" type="text/javascript"></script>
+    <script src="~/WebSite/assets/js/litebox.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $('.litebox').liteBox();
+    </script>
+   
+}

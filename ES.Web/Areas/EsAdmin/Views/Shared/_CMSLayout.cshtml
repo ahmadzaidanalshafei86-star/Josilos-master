@@ -1,0 +1,378 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+<!doctype html>
+<html lang="@CultureInfo.CurrentCulture.Name" dir="@(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "rtl" : "ltr")">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="~/CMS/favicon.ico">
+
+    <script>
+        // Immediately apply theme before the page loads
+        (function () {
+            var savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.documentElement.className = "dark-theme"; // Apply dark mode instantly
+            } else {
+                document.documentElement.className = "light-theme"; // Default to light
+            }
+        })();
+
+    </script>
+
+    <script>
+    window.appBaseUrl = '@Url.Content("~/")';
+   </script>
+
+
+<link href="@Url.Content("~/CMS/css/site.css")" rel="stylesheet" />
+<link href="@Url.Content("~/CMS/lib/sweetalert2/sweetalert2.min.css")" rel="stylesheet" />
+
+<!-- Theme Styles -->
+<link href="@Url.Content("~/CMS/assets/css/dark-theme.css")" rel="stylesheet" />
+<link href="@Url.Content("~/CMS/assets/css/semi-dark.css")" rel="stylesheet" />
+<link href="@Url.Content("~/CMS/assets/css/header-colors.css")" rel="stylesheet" />
+
+    @if (CultureInfo.CurrentCulture.Name.StartsWith("en"))
+    {
+        <!-- Plugins -->
+        <link href="@Url.Content("~/CMS/assets/plugins/simplebar/css/simplebar.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/plugins/metismenu/css/metisMenu.min.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/plugins/select2/css/select2.min.css")" rel="stylesheet" />
+
+        @await RenderSectionAsync("Styles", required: false)
+
+        <!-- CSS Files -->
+        <link href="@Url.Content("~/CMS/assets/css/bootstrap.min.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/css/bootstrap-extended.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/css/style.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/css/icons.css")" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+    }
+
+    @if (CultureInfo.CurrentCulture.Name.StartsWith("ar"))
+    {
+        <!-- Plugins -->
+        <link href="@Url.Content("~/CMS/assets/assetsRtl/plugins/simplebar/css/simplebar.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/assetsRtl/plugins/metismenu/css/metisMenu.min.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/plugins/select2/css/select2.min.css")" rel="stylesheet" />
+        @await RenderSectionAsync("Styles", required: false)
+
+        <!-- CSS Files -->
+        <link href="@Url.Content("~/CMS/assets/assetsRtl/css/bootstrap.min.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/assetsRtl/css/bootstrap-extended.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/assetsRtl/css/style.css")" rel="stylesheet" />
+        <link href="@Url.Content("~/CMS/assets/assetsRtl/css/icons.css")" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+    }
+
+
+    <title>@ViewData["Title"]</title>
+</head>
+
+<body>
+
+    <!--start wrapper-->
+    <div class="wrapper">
+
+        <!--start sidebar -->
+        <aside class="sidebar-wrapper" data-simplebar="true">
+            <div class="sidebar-header px-3 py-4">
+                <div class="d-flex justify-content-start">
+                    <a href="https://www.es.jo/" target="_blank" rel="noopener noreferrer">
+                        <img src="~/CMS/assets/images/icons/ESjo_logo-02.png"
+                             class="logo-icon img-fluid"
+                             alt="ES Logo"
+                             style="width: 240px; max-width: 100%; height: 130px; padding-top: 25px; padding-bottom: 15px; margin-left: -15px;">
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- Navigation -->
+            <ul class="metismenu mm-show" id="menu">
+                <!-- Dashboard (Most Frequently Used) -->
+                <li>
+                    <a asp-controller="Home" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-home"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Dashboard"]</div>
+                    </a>
+                </li>
+
+                <!-- Content Management Section -->
+                <li>
+                    <a asp-controller="Categories" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-layout"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Categories"]</div>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Pages" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-layers"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Pages"]</div>
+                    </a>
+                </li>
+
+
+                <li style="display:none">
+                    <a asp-controller="Materials" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-layout"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Materials"]</div>
+                    </a>
+                </li>
+
+                <li style="display:none">
+                    <a asp-controller="Tenders" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-layout"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Tenders"]</div>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="NewsLetter" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-envelope"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["News Letter Subscriptions"]</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="MenuManager" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-list"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Menu Management"]</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="UploadDocuments" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-files" aria-label="document text outline"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Upload documents"]</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Forms" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-popup"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Form Builder"]</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="MediaManagement" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-image"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Media Management"]</div>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Languages" asp-action="SetDefaultDbLanguage">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-world"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Language settings"]</div>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Smtp" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-envelope"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["SMTP Settings"]</div>
+                    </a>
+                </li>
+
+                <!-- Careers -->
+                <li>
+                    <a asp-controller="Careers" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-network"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Careers"]</div>
+                    </a>
+                </li>
+
+                <!-- Social media links -->
+                <li>
+                    <a asp-controller="SocialMediaLinks" asp-action="Index">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-link"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Social media links"]</div>
+                    </a>
+                </li>
+
+                <!-- User & Role Management (Grouped Together) -->
+                <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon">
+                            <ion-icon class="lni lni-lock" role="img" aria-label="lock closed outline"></ion-icon>
+                        </div>
+                        <div class="menu-title">@Localizer["Users Management"]</div>
+                    </a>
+                    <ul>
+                        <li>
+                            <a asp-controller="Users" asp-action="Index">
+                                <div class="parent-icon">
+                                    <ion-icon class="lni lni-users" role="img" aria-label="person circle outline"></ion-icon>
+                                </div>
+                                <div class="menu-title">@Localizer["Users"]</div>
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Roles" asp-action="Index">
+                                <div class="parent-icon">
+                                    <ion-icon class="lni lni-users"></ion-icon>
+                                </div>
+                                <div class="menu-title">@Localizer["Roles"]</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            <li>
+                <a asp-controller="Null" asp-action="Index">
+                    <div class="parent-icon">
+                        <ion-icon class="lni lni-plus"></ion-icon>
+                    </div>
+                    <div class="menu-title">@Localizer["Extensions"]</div>
+                </a>
+            </li>
+
+            </ul>
+            <!-- End Navigation -->
+        </aside>
+        <!--end sidebar -->
+
+        <!--start top header-->
+        <header class="top-header">
+            <nav class="navbar navbar-expand gap-3">
+                <div class="toggle-icon">
+                    <ion-icon class="lni lni-menu"></ion-icon>
+                </div>
+
+                <form id="anti-forgery-form">
+                    @Html.AntiForgeryToken()
+                </form>
+               
+                <div class="top-navbar-right ms-auto">
+
+                    <ul class="navbar-nav align-items-center">
+
+                        <li>
+                            <div>
+                                <partial name="_SelectLanguagePartial" />
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link dark-mode-icon" href="javascript:;">
+                                <div class="mode-icon">
+                                    <ion-icon class="lni lni-night"></ion-icon>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <ul class="navbar d-flex align-items-center flex-wrap">
+                                    <li class="d-inline me-3">
+                                        <h6 class="mb-0 px-3 py-2 rounded shadow-sm text-center text-md-start"
+                                            style="background-color: var(--bs-light); color: var(--bs-dark);">
+                                            @Localizer["Hello"], <span class="fw-bold">@User.Identity?.Name</span>
+                                        </h6>
+                                    </li>
+                                    <li class="d-inline">
+                                        <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <div class="col text-center text-md-end">
+                                                <button type="submit" class="btn btn-outline-primary px-3 d-flex align-items-center justify-content-center">
+                                                    <ion-icon class="lni lni-exit" role="img"></ion-icon>
+                                                    @Localizer["Logout"]
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+
+                            }
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!--end top header-->
+        <!-- start page content wrapper-->
+        <div class="page-content-wrapper">
+            <!-- start page content-->
+            <div class="page-content">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/CMS/lib/sweetalert2/sweetalert2.min.js"></script>
+
+    @if (CultureInfo.CurrentCulture.Name.StartsWith("en"))
+    {
+        <!-- JS Files-->
+        <script src="~/CMS/assets/js/jquery.min.js"></script>
+        <script src="~/CMS/assets/plugins/simplebar/js/simplebar.min.js"></script>
+        <script src="~/CMS/assets/plugins/metismenu/js/metisMenu.min.js"></script>
+        <script src="~/CMS/assets/js/bootstrap.bundle.min.js"></script>
+        <!--plugins-->
+        <script src="~/CMS/assets/plugins/select2/js/select2.min.js"></script>
+        <script src="~/CMS/assets/js/index.js"></script>
+        <script src="~/CMS/lib/tinymce/tinymce.min.js"></script>
+        <script src="~/CMS/js/site.js"></script>
+        <!-- Main JS-->
+        @await RenderSectionAsync("Plugins", required: false)
+        <script src="~/CMS/assets/js/main.js"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+    }
+    @if (CultureInfo.CurrentCulture.Name.StartsWith("ar"))
+    {
+        <!-- JS Files-->
+        <script src="~/CMS/assets/assetsRtl/js/jquery.min.js"></script>
+        <script src="~/CMS/assets/assetsRtl/plugins/simplebar/js/simplebar.min.js"></script>
+        <script src="~/CMS/assets/assetsRtl/plugins/metismenu/js/metisMenu.min.js"></script>
+        <script src="~/CMS/assets/assetsRtl/js/bootstrap.bundle.min.js"></script>
+        <!--plugins-->
+        <script src="~/CMS/assets/plugins/select2/js/select2.min.js"></script>
+        <script src="~/CMS/assets/assetsRtl/js/index.js"></script>
+        <script src="~/CMS/lib/tinymce/tinymce.min.js"></script>
+        <script src="~/CMS/js/site.js"></script>
+        <!-- Main JS-->
+        @await RenderSectionAsync("Plugins", required: false)
+        <script src="~/CMS/assets/assetsRtl/js/main.js"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+    }
+
+</body>
+
+</html>
+
+

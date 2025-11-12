@@ -1,0 +1,151 @@
+﻿@model CareersViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Text.RegularExpressions
+@inject IViewLocalizer Localizer
+
+
+<!--Title and breadCramp-->
+<div class="caption-inner" >
+    <div class="inner-bg" style="background: url(WebSite/images/header2.jpg) no-repeat fixed center center;"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">@Localizer["Home"]</a></li>
+                    <li class="active">@Localizer["Careers"]</li>
+                </ol>
+                <h3><span>@Localizer["Careers"]</span></h3>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-inner">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <!-- Left Column: Career Listings -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+
+                <h3 class="big-text">@Localizer["Current Positions"]:</h3>
+                @foreach (var career in Model.Careers)
+                {
+                    <div class="gray-box" style="margin-bottom: 20px;">
+                        <div class="code_apply">
+                            Ref# : @career.RefNumber
+                            <a href="#" class="code_apply apply-link" data-career-id="@career.Id">@Localizer["APPLY"]</a>
+                        </div>
+                        @career.JobTitle
+                        <br>@Localizer["Region"]: @career.Location
+                        <br>@Localizer["Environment"]: @Localizer[@career.EnviromentType!]
+                        <br><br>
+                        <button type="button" class="btn-header btn-white2" data-toggle="collapse" data-target="#demo-@career.Id">@Localizer["Details"]</button>
+                        <div id="demo-@career.Id" class="collapse">
+                            @Html.Raw(career.Description)
+                        </div>
+
+
+                        @if (!ViewData.ModelState.IsValid && ViewData["CareerId"]?.ToString() == career.Id.ToString())
+                        {
+                            <div class="alert alert-danger">
+                                @Html.ValidationSummary()
+                            </div>
+                        }
+                        <!-- Slide-In Application Form -->
+                        <div id="apply-form-@career.Id" class="apply-form collapse" style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                            <h5>@Localizer["Submit Your CV for"] @career.JobTitle</h5>
+
+                            <form asp-action="Apply" method="post" enctype="multipart/form-data">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="careerId" value="@career.Id" required />
+                                @foreach (var field in Model.CareerForm.Fields.OrderBy(f => f.Order))
+                                {
+                                    <div class="form-group">
+                                        <label>@field.DisplayName @(field.IsRequired ? "*" : "")</label>
+                                        @if (field.FieldType == "text")
+                                        {
+                                            <input type="text" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "") />
+                                        }
+                                        else if (field.FieldType == "textarea")
+                                        {
+                                            <textarea name="@field.FieldName" class="form-control" rows="5" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "")></textarea>
+                                        }
+                                        else if (field.FieldType == "phoneNumber")
+                                        {
+                                            <input type="number" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" pattern="(\+?[1-9]{1}[0-9]{1,3})?[0-9]{7,15}" @(field.IsRequired ? "required" : "") />
+                                        }
+                                        else if (field.FieldType == "email")
+                                        {
+                                            <input type="email" name="@field.FieldName" class="form-control" placeholder="@field.FieldHint" @(field.IsRequired ? "required" : "") />
+                                        }
+                                        else if (field.FieldType == "select")
+                                        {
+                                            <select name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "")>
+                                                <option value="">Select an option</option>
+                                                @foreach (var option in field.Options.OrderBy(o => o.Order))
+                                                {
+                                                    <option value="@option.OptionText">@option.OptionText</option>
+                                                }
+                                            </select>
+                                        }
+                                        else if (field.FieldType == "checkbox")
+                                        {
+                                            <div class="form-group">
+                                                @foreach (var option in field.Options.OrderBy(o => o.Order))
+                                                {
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="@field.FieldName" value="@option.OptionText" class="form-check-input" id="@(field.FieldName)_@option.Id" />
+                                                        <label class="form-check-label" for="@(field.FieldName)_@option.Id">@option.OptionText</label>
+                                                    </div>
+                                                }
+                                                @if (field.IsRequired)
+                                                {
+                                                    <input type="hidden" name="@field.FieldName" value="" class="checkbox-validator" />
+                                                    <small class="text-danger" style="display:none;">Please select at least one option.</small>
+                                                }
+                                            </div>
+                                        }
+                                        else if (field.FieldType == "file")
+                                        {
+                                            <div class="text-center" style="color:#229fa6;">@field.FieldHint</div>
+                                            <input type="file" name="@field.FieldName" class="form-control" style="padding: 10px; background-color: whitesmoke; border-radius: 5px; width: 100%;" @(field.IsRequired ? "required" : "") />
+                                        }
+                                        else if (field.FieldType == "rating")
+                                        {
+                                            <select name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "")>
+                                                <option value="">Rate (1-5)</option>
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            </select>
+                                        }
+                                        else if (field.FieldType == "date")
+                                        {
+                                            <input type="date" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
+                                        }
+                                    </div>
+                                }
+                                <button type="submit" class="btn-header btn-more green-button">@Localizer["Submit"] <i class="fas fa-arrow-right"></i></button>
+                                <button type="button" class="btn-header btn-cancel" data-career-id="@career.Id">@Localizer["Cancel"]</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="~/WebSite/js/careers.js"></script>
+}

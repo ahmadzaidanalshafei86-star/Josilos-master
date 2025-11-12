@@ -1,0 +1,30 @@
+﻿@model IEnumerable<PageViewModel>
+
+
+<link href="~/WebSite/css/component.css" rel="stylesheet">
+<ul class="grid2 cs-style-3">
+
+
+	@foreach (var Page in Model)
+	{
+	
+
+
+		<li>
+			<a href="@Page.LinkUrl">
+				<figure>
+					<img src="@Url.Content("~/images/Pages/" + Page.FeaturedImageUrl)" alt="">
+					<figcaption>
+						<h3>@Page.Title</h3>
+					</figcaption>
+				</figure>
+			</a>
+		</li>
+	}
+	
+	
+</ul>
+
+
+
+

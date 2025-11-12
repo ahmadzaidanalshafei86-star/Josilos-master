@@ -1,0 +1,61 @@
+﻿@model ProductLabelTranslateFormModel
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+
+<form id="translationForm" class="p-4">
+    <input asp-for="ProductLabelId" type="hidden" id="ProductLabelId" name="productLabelId" value="@Model.ProductLabelId" />
+    <input asp-for="TranslationId" type="hidden" id="TranslationId" name="TranslationId" value="@Model.TranslationId" />
+
+    @if (Model.TranslationId == 0)
+    {
+        <div class="mb-4">
+            <label for="language" class="form-label fw-semibold">@Localizer["Language"]</label>
+            <select asp-for="LanguageId" asp-items="Model.Languages" class="form-select">
+            </select>
+            <span asp-validation-for="LanguageId" class="text-danger small"></span>
+        </div>
+    }
+
+    <div class="mb-4">
+        <label for="Title" class="form-label fw-semibold">@Localizer["Title"] <span class="text-danger">*</span></label>
+        <input asp-for="Name" type="text" id="Title" name="Name" class="form-control" required placeholder="@Localizer["Enter Product label Name"]" />
+        <span asp-validation-for="Name" class="text-danger small"></span>
+    </div>
+
+   
+
+    <button type="submit" class="btn btn-success px-4 py-2 mt-3">@Localizer["Save"]</button>
+</form>
+
+
+
+<style>
+    form {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    input.form-control {
+        height: 44px;
+        border-radius: 6px;
+    }
+
+    .btn-primary {
+        background: #4a90e2;
+        border: none;
+        border-radius: 6px;
+    }
+
+        .btn-primary:hover {
+            background: #357ab7;
+        }
+</style>

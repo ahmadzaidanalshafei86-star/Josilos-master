@@ -1,0 +1,268 @@
+﻿@model List<MediaViewModel>
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Media Management"];
+    var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}";
+}
+
+@section Styles {
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <link href="~/CMS/lib/cropperjs/cropper.css" rel="stylesheet" />
+    <!-- Custom Styles -->
+    <style>
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+        .editable-alt {
+            cursor: pointer;
+            border-bottom: 1px dashed #ccc;
+        }
+
+            .editable-alt:focus {
+                border-bottom: 1px solid #007bff;
+                outline: none;
+            }
+
+        .copy-url {
+            transition: opacity 0.2s;
+        }
+
+            .copy-url:hover {
+                opacity: 0.8;
+            }
+
+
+        .img-container {
+            width: 100%; /* Ensure the container takes full width */
+            height: 70vh; /* Set a fixed height for the container */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Prevent image overflow */
+        }
+
+
+        #cropperImage {
+            width: 100% !important; /* Force image to fill container */
+            height: auto !important; /* Maintain aspect ratio */
+            max-width: none !important;
+            max-height: 80vh !important; /* Keep image within viewport */
+            object-fit: contain;
+            display: block;
+            margin: auto;
+        }
+
+        #imageCropperModal .modal-body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70vh; /* Increase modal height */
+            overflow: hidden; /* Prevent scrollbar issues */
+        }
+
+    </style>
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-start align-items-center mt-4 mb-4">
+        <h2 class="mb-0"> <i class="lni lni-folder"></i> @Localizer["Media Management"]</h2>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12 d-flex flex-wrap gap-2">
+            <div class="flex-grow-1">
+                <input type="text" id="searchTerm" class="form-control rounded-pill" placeholder="🔍 @Localizer["Search media..."]">
+            </div>
+            <div>
+                <select id="mediaType" class="form-select rounded-pill">
+                    <option value="">@Localizer["All Types"]</option>
+                    <option value="Category Cover Images">@Localizer["Category Cover Images"]</option>
+                    <option value="Category Featured Images">@Localizer["Category Featured Images"]</option>
+                    <option value="Category Gallery Images">@Localizer["Category Gallery Images"]</option>
+                    <option value="Page Cover Images">@Localizer["Page Cover Images"]</option>
+                    <option value="Page Featured Images">@Localizer["Page Featured Images"]</option>
+                    <option value="Page Gallery Images">@Localizer["Page Gallery Images"]</option>
+                    <option value="Page Files">@Localizer["Page Files"]</option>
+                </select>
+            </div>
+
+            @{
+                var categories = Model.Where(m => m.Type.Contains("Category")).Select(m => m.CategoryOrPageName).Distinct().ToList();
+                var pages = Model.Where(m => m.Type.Contains("Page")).Select(m => m.CategoryOrPageName).Distinct().ToList();
+            }
+
+            <div>
+                <select id="mediaCategory" class="form-select rounded-pill">
+                    <option value="">@Localizer["All Categories"]</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>
+
+            <div>
+                <select id="mediaPage" class="form-select rounded-pill">
+                    <option value="">@Localizer["All Pages"]</option>
+                    @foreach (var item in pages)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Media Gallery Grid -->
+    <div class="row g-4" id="mediaGallery">
+        @foreach (var media in Model)
+        {
+            var fullUrl = $"{baseUrl}{media.ImageUrl}";
+
+            <div class="col-12 col-md-6 col-lg-4 media-item"
+                 data-type="@media.Type"
+                 data-category="@((media.Type.Contains("Category")) ? media.CategoryOrPageName : "")"
+                 data-page="@((media.Type.Contains("Page")) ? media.CategoryOrPageName : "")"
+                 data-altname="@media.AltName">
+                <div class="card h-100 shadow-sm border-0">
+                    @if (media.ImageUrl.EndsWith(".pdf"))
+                    {
+                        <!-- PDF File -->
+                        <div class="text-center p-4">
+                            <a href="@fullUrl" target="_blank">
+                                <img src="~/CMS/assets/images/icons/PDFIc.png" class="img-fluid" style="max-height: 100px;" alt="PDF File">
+                            </a>
+                        </div>
+                    }
+                    else if (media.ImageUrl.EndsWith(".doc") || media.ImageUrl.EndsWith(".docx"))
+                    {
+                        <!-- Word File -->
+                        <div class="text-center p-4">
+                            <a href="@fullUrl" target="_blank">
+                                <img src="~/CMS/assets/images/icons/doc.png" class="img-fluid" style="max-height: 100px;" alt="Word File">
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Image File -->
+                        <!-- Lightbox Link (For Viewing) -->
+                        <a href="@fullUrl" data-lightbox="media-gallery" data-title="@media.AltName">
+                            <img src="@fullUrl" class="card-img-top img-thumbnail object-fit-cover" style="height: 200px;" alt="@media.AltName">
+                        </a>
+
+                        <!-- New Edit Button -->
+                        <div class="d-flex justify-content-center mt-2">
+                            <button class="btn btn-outline-info edit-image-btn rounded-pill shadow-sm px-3 py-1 d-flex align-items-center gap-2 transition-all" data-url="@fullUrl">
+                                <i class="lni lni-pencil"></i> @Localizer["Edit Image"]
+                            </button>
+                        </div>
+                    }
+
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        @Html.AntiForgeryToken()
+                        <h6 class="card-title text-truncate editable-alt" contenteditable="true"
+                            data-id="@media.Id" data-type="@media.Type">
+                            @media.AltName
+                        </h6>
+
+                        <!-- Media Type & Date (Left-aligned, Each on a Separate Line) -->
+                        <div class="mb-2 text-start">
+                            <span class="badge bg-bronze rounded-pill d-inline-block mb-2">
+                                <i class="lni lni-folder"></i> @Localizer[media.Type] / @media.CategoryOrPageName
+                            </span>
+                            <span class="text-muted small d-block" title="@Localizer["Creation Date"]">
+                                <i class="lni lni-calendar"></i> @(media.CreatedDate?.ToString("dd MMM yyyy") ?? "N/A")
+                            </span>
+                        </div>
+
+                        <!-- Shortened URL Display with Copy Button -->
+                        <div class="d-flex align-items-center flex-wrap">
+                            @{
+                                string displayUrl = Context.Request.Host + media.ImageUrl.Substring(media.ImageUrl.LastIndexOf('/'));
+                                string truncatedUrl = displayUrl.Length > 25 ? displayUrl.Substring(0, 22) + "..." : displayUrl;
+                            }
+                            <p class="card-text small text-break mb-0 flex-grow-1">
+                                <strong>@Localizer["URL :"]</strong>
+                                <a href="@fullUrl" target="_blank" title="@fullUrl">
+                                    @truncatedUrl
+                                </a>
+                            </p>
+                            <button class="btn btn-sm btn-light border-0 copy-url ms-2" data-url="@fullUrl" title="@Localizer["Copy URL"]">
+                                <i class="lni lni-clipboard"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Media pagination">
+        <ul class="pagination justify-content-center mt-4" id="pagination">
+            <!-- Pagination will be generated here -->
+        </ul>
+    </nav>
+</div>
+
+<!-- Image Cropping Modal -->
+<div class="modal fade" id="imageCropperModal" tabindex="-1" aria-labelledby="imageCropperLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageCropperLabel">@Localizer["Edit Image"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Close"]"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="img-container">
+                    <img id="cropperImage" class="img-fluid" src="" alt="@Localizer["Image to Crop"]">
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div>
+                    <button type="button" class="btn btn-secondary rotate-left">
+                        <i class="lni lni-reload"></i> @Localizer["Rotate Left"]
+                    </button>
+                    <button type="button" class="btn btn-secondary rotate-right">
+                        <i class="lni lni-reload"></i> @Localizer["Rotate Right"]
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        @Localizer["Cancel"]
+                    </button>
+                    <button type="button" class="btn btn-primary" id="cropImageBtn">
+                        @Localizer["Crop & Save"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script src="~/CMS/lib/cropperjs/cropper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script src="~/CMS/js/mediaManagment.js"></script>
+}

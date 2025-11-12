@@ -1,0 +1,72 @@
+﻿@model MenuItemTranslationFormViewModel
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+
+<form id="translationForm" class="p-4">
+    <input asp-for="MenuItemId" type="hidden" id="MenuItemId" name="MenuItemId" value="@Model.MenuItemId" />
+    <input asp-for="TranslationId" type="hidden" id="TranslationId" name="TranslationId" value="@Model.TranslationId" />
+
+    @if (Model.TranslationId == 0)
+    {
+        <div class="mb-4">
+            <label for="language" class="form-label fw-semibold">@Localizer["Language"]</label>
+            <select asp-for="LanguageId" asp-items="Model.Languages" class="form-select">
+            </select>
+            <span asp-validation-for="LanguageId" class="text-danger small"></span>
+        </div>
+    }
+
+    <div class="mb-4">
+        <label for="Title" class="form-label fw-semibold">@Localizer["Title"] <span class="text-danger">*</span></label>
+        <input asp-for="Title" type="text" id="Title" name="Title" class="form-control" required placeholder="@Localizer["Enter menu item title"]" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-4">
+        <label for="CustomUrl" class="form-label fw-semibold">@Localizer["Custom URL"]</label>
+        <input asp-for="CustomUrl" type="text" id="CustomUrl" name="CustomUrl" class="form-control" placeholder="e.g., www.example.com" />
+        <span asp-validation-for="CustomUrl" class="text-danger small"></span>
+        <small class="text-muted d-block mt-2">
+            @Localizer["If you have chosen a Custom URL for the menu item type, please provide the corresponding URL for the selected language."]
+        </small>
+    </div>
+
+    <button type="submit" class="btn btn-success px-4 py-2 mt-3">@Localizer["Save"]</button>
+</form>
+
+@section Scripts {
+    <script>
+        // Additional scripts if required
+    </script>
+}
+
+<style>
+    form {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    input.form-control {
+        height: 44px;
+        border-radius: 6px;
+    }
+
+    .btn-primary {
+        background: #4a90e2;
+        border: none;
+        border-radius: 6px;
+    }
+
+        .btn-primary:hover {
+            background: #357ab7;
+        }
+</style>

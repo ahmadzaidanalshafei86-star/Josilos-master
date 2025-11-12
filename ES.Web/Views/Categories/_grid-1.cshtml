@@ -1,0 +1,26 @@
+﻿ @model IEnumerable<PageViewModel> 
+
+@foreach (var Page in Model)
+{
+
+
+
+
+
+    <div class="col-sm-6 col-md-3">
+        <a href="@Page.LinkUrl">
+            <div class="frame">
+                <img alt="@Page.FeaturedImageAltName" src="~/images/Pages/@Page.FeaturedImageUrl" class="img-responsive">
+                <div class="details">
+                    <div class="details-border">
+                        <h2>@Page.Title</h2>
+                    </div>
+                </div>
+
+            </div>
+        </a>
+        <div class="category-title">@Page.Title</div>
+
+    </div>
+}
+

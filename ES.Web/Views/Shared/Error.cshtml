@@ -1,0 +1,43 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="caption-inner py-5">
+    <div class="container">
+        <div class="card radius-10 shadow-lg p-4 p-md-5 my-5 animate__animated animate__fadeIn">
+            <div class="row g-5 align-items-center">
+
+                <!-- Text Column -->
+                <div class="col-lg-6">
+                    <div class="card-body text-center text-lg-start">
+                        <h1 class="fw-bold text-danger display-3">@Model.ErrorCode</h1>
+                        <h2 class="text-muted mt-3">@Model.ErrorDescription</h2>
+                        <p class="text-muted mt-4 fs-5">
+                            We're sorry, something went wrong. Please try again later or contact support if the issue persists.
+                        </p>
+                        <div class="mt-5 d-flex flex-column flex-md-row justify-content-center justify-content-lg-start gap-3">
+                            <a href="~/" class="btn btn-lg btn-primary px-5 radius-30 shadow-sm">
+                                <i class="bi bi-house-door-fill me-2"></i> Go Home
+                            </a>
+                            <button onclick="window.history.back();" class="btn btn-lg btn-danger px-5 radius-30 shadow-sm">
+                                <i class="bi bi-arrow-left-circle me-2"></i> Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Column -->
+                <div class="col-lg-6 text-center">
+                    <img src="~/CMS/assets/images/error/505-error.png"
+                         class="img-fluid rounded-end"
+                         alt="Error illustration"
+                         style="max-height: 400px;">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,143 @@
+﻿@model FormTranslationFormViewModel
+
+ @using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Model.TranslationId > 0 ? @Localizer["Edit Translation"] : @Localizer["Add Translation"];
+}
+
+
+<div class="container">
+    <h5 class="fw-bold d-flex align-items-center">
+        <img src="~/CMS/assets/images/icons/translate.png" alt="Translations Icon" class="me-2 img-fluid" style="width: 32px; height: auto; max-width: 100%;">
+        @Localizer["Form Translation"]
+    </h5>
+    <br />
+    <form ِasp-contrller="FormsTranslates" id="translateForm" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="TranslationId" />
+        <input type="hidden" asp-for="FormId" />
+
+        <!-- Language Selection -->
+        @if (Model.TranslationId == 0)
+        {
+            <div class="mb-4">
+                <label class="form-label fw-bold">@Localizer["Target Language"]</label>
+                <select asp-for="LanguageId" asp-items="Model.Languages" class="form-select" required>
+                </select>
+                <span asp-validation-for="LanguageId" class="text-danger"></span>
+            </div>
+        }
+
+        <!-- Form Title & Description -->
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="text-secondary fw-bold"><i class="bi bi-card-heading"></i> @Localizer["Form Headers"]</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">@Localizer["Form Title"]</label>
+                        <input type="text" class="form-control" asp-for="Title" placeholder="@Localizer["Enter translated title"]" required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">@Localizer["Form Description"]</label>
+                        <textarea class="form-control" asp-for="Description" placeholder="@Localizer["Enter translated description"]" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fields Translation -->
+        <h5 class="mt-4 text-primary fw-bold"><i class="bi bi-card-list"></i> @Localizer["Translate Form Fields"]</h5>
+
+        <div class="accordion" id="fieldsAccordion">
+            @for (int i = 0; i < Model.Fields.Count; i++)
+            {
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading@(i)">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(i)" aria-expanded="false" aria-controls="collapse@(i)">
+                            <span class="badge bg-info me-2">Field @(i + 1)</span> @Model.Fields[i].OriginalText
+                        </button>
+                    </h2>
+                    <div id="collapse@(i)" class="accordion-collapse collapse" aria-labelledby="heading@(i)" data-bs-parent="#fieldsAccordion">
+                        <div class="accordion-body">
+                            <input type="hidden" asp-for="Fields[i].FieldId" />
+
+                            <input type="text" class="form-control mb-3" asp-for="Fields[i].TranslatedText"
+                                   placeholder="@Localizer["Enter field title translation"]" required />
+                            <span asp-validation-for="Fields[i].TranslatedText" class="text-danger d-block mt-1 small fw-bold"></span>
+
+                            @if (Model.Fields[i].TranslatedFieldHint is not null)
+                            {
+                                <div class="mb-3">
+                                    <strong class="text-secondary">@Localizer["Field Hint"]</strong>
+                                    <textarea asp-for="Fields[i].TranslatedFieldHint" class="form-control rounded-3 p-2 bg-light"
+                                              placeholder="@Localizer["Enter translated Field Hint"]" rows="3"></textarea>
+                                    <span asp-validation-for="Fields[i].TranslatedFieldHint" class="text-danger d-block mt-1 small fw-bold"></span>
+                                </div>
+                            }
+
+                            @if (Model.Fields[i].Options.Any())
+                            {
+                                <strong class="text-secondary">@Localizer["Options"]</strong>
+                                <div class="row">
+                                    @for (int j = 0; j < Model.Fields[i].Options.Count; j++)
+                                    {
+                                        <div class="col-12 mt-2">
+                                            <div class="input-group">
+                                                <span class="input-group-text">@Model.Fields[i].Options[j].OriginalText</span>
+                                                <input type="hidden" asp-for="@Model.Fields[i].Options[j].OptionId" />
+                                                <input type="text" class="form-control" asp-for="Fields[i].Options[j].TranslatedText" placeholder="@Localizer["Enter option text translation"]" />
+                                                <span asp-validation-for="Fields[i].Options[j].TranslatedText" class="text-danger d-block mt-1 small fw-bold"></span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Save Button -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success btn-lg px-2">
+                <i class="lni lni-save me-2"></i>@Localizer["Save Translation"]
+            </button>
+        </div>
+    </form>
+</div>
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Enable Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Open accordion panels that have validation errors
+            document.querySelectorAll('.accordion-collapse').forEach(function (collapse) {
+                if (collapse.querySelector('.text-danger:not(:empty)')) {
+                    var parentAccordion = collapse.closest('.accordion-item');
+                    var button = parentAccordion.querySelector('.accordion-button');
+
+                    // Open the collapse
+                    collapse.classList.add('show');
+
+                    // Ensure the button reflects the open state
+                    button.classList.remove('collapsed');
+                    button.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+    </script>
+}

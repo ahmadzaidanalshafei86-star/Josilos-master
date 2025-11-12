@@ -1,0 +1,96 @@
+﻿@model MenuItemTranslatesViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@section Styles {
+    <link href="~/CMS/css/translationindex.css" rel="stylesheet" />
+}
+
+@{
+    ViewData["Title"] = @Localizer["Menu Item Translations"];
+}
+
+<div id="translations-section" class="container py-4">
+    
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-bold d-flex align-items-center">
+            <img src="~/CMS/assets/images/icons/translate.png"
+                 alt="Translations Icon"
+                 class="me-2 img-fluid"
+                 style="width: 32px; height: auto; max-width: 100%;">
+            @Localizer["Translations"]
+        </h5>
+        @if (Model.PreEnteredTranslations.Count() < 1)
+        {
+            <a href="#" class="btn btn-success d-flex align-items-center" onclick="openTranslationModal(@Model.MenuItemId); return false;">
+                <i class="lni lni-plus me-2" style="font-size: 1.2rem;"></i>
+                @Localizer["Add New Translation"]
+            </a>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table">
+            <thead>
+                <tr>
+                    <th>@Localizer["Title"]</th>
+                    <th>@Localizer["Language"]</th>
+                    <th>@Localizer["Creation date"]</th>
+                    <th>@Localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold">@Model.MenuItemTitle</td>
+                    <td class="text-muted">@Localizer[Model.MenuItemDefaultLang!] / @Localizer["default language"]</td>
+                    <td>@Model.CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td></td>
+                </tr>
+                @if (Model.PreEnteredTranslations is not null)
+                {
+                    @foreach (var translation in Model.PreEnteredTranslations)
+                    {
+                        <tr>
+                            <td>@translation.Title</td>
+                            <td>@Localizer[@translation.Language.Code]</td>
+                            <td>@translation.CreatedDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a href="#" title=@Localizer["Edit Translation"] onclick="openTranslationModal(@Model.MenuItemId, @translation.Id); return false;" class="me-2">
+                                    <i class="lni lni-pencil hover-scale text-primary"></i>
+                                </a>
+                                <a href="javascript:;" onclick="deleteTranslation('@translation.Id', this)" title=@Localizer["Delete"]>
+                                    <i class="lni lni-trash hover-scale text-danger"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="translationModal" tabindex="-1" aria-labelledby="translationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="translationModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form will be loaded dynamically here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // Set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script src="~/CMS/js/menuItemTranslates.js"></script>
+}

@@ -1,0 +1,60 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+/* Ensure the logo remains large and responsive */
+.logo-icon {
+    width: 300px; /* Increase to 350px or more if needed */
+    max-width: 100%;
+    height: auto;
+}
+
+    /* Hover effect for a modern touch */
+    .logo-icon:hover {
+        transform: scale(1.03);
+    }
+
+/* Remove any dark mode filter */
+@media (prefers-color-scheme: dark) {
+    .logo-icon {
+        filter: none !important; /* Ensures no change in dark mode */
+    }
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff !important;
+    color: #fff !important; /* Ensure text is readable */
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.nav-tabs .nav-link {
+    transition: background-color 0.3s, color 0.3s;
+}
+.tab-pane {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+}
+
+    .tab-pane.active {
+        visibility: visible;
+        height: auto;
+        overflow: visible;
+    }
+

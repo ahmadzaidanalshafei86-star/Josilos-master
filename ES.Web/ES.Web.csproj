@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-ES.Web-148b715b-224f-4a2e-9242-100b717e3288</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\images\Brands\**" />
+    <Content Remove="wwwroot\images\Brands\**" />
+    <EmbeddedResource Remove="wwwroot\images\Brands\**" />
+    <None Remove="wwwroot\images\Brands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.2.1" />
+    <PackageReference Include="MailKit" Version="4.14.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="MimeKit" Version="4.14.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.10" />
+    <PackageReference Include="UoN.ExpressiveAnnotations.NetCore" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Views\Shared\NewFolder\" />
+    <Folder Include="wwwroot\CMS\documents\ProductReviews\" />
+    <Folder Include="wwwroot\images\Categories\GalleryImages\" />
+    <Folder Include="wwwroot\images\Pages\GalleryImages\" />
+    <Folder Include="wwwroot\images\Products\GalleryImages\" />
+    <Folder Include="wwwroot\CMS\sounds\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ES.Core\ES.Core.csproj" />
+    <ProjectReference Include="..\ES.Infrastructure\ES.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

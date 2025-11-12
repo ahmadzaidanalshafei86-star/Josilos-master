@@ -1,0 +1,20 @@
+﻿@model PageViewModel
+
+<div class="col-sm-12 wow bounceIn" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.2s; animation-name: bounceIn;">
+    <div class="photo-gallery">
+        <div class="one-whole">
+            <div class="img-gallery">
+                @foreach (var img in Model.GalleryImages)
+                {
+                    <a href="~/images/Pages/GalleryImages/@img.GalleryImageUrl"
+                       target="_self"
+                       class="inline-block litebox"
+                       data-litebox-group="group-1">
+                        <img src="~/images/Pages/GalleryImages/@img.GalleryImageUrl" alt="@img.GalleryImageAltName" class="img-responsive thumbs">
+                    </a>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>

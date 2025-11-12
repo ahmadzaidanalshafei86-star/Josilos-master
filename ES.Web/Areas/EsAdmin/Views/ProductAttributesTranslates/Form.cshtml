@@ -1,0 +1,97 @@
+﻿@model ProductAttributeTranslateFormModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Translations"];
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-xl-12 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <div class="border p-3 rounded">
+                        <h6 class="mb-0 text-uppercase">
+                            @((Model.TranslationId > 0) ? Localizer["Edit translation"] : Localizer["Add translation"])
+                        </h6>
+                        <hr>
+                        <form asp-controller="ProductAttributesTranslates" method="post">
+                            @Html.AntiForgeryToken()
+                            @if (Model.TranslationId > 0)
+                            {
+                                <input type="hidden" asp-for="TranslationId" />
+                                <input type="hidden" asp-for="LanguageId" />
+                            }
+
+                            <input type="hidden" asp-for="AttributeId" />
+
+
+                            @if(Model.TranslationId == 0 ){
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="language" class="form-label col-form-label">@Localizer["Select Language"]</label>
+                                    <select asp-for="LanguageId" asp-items="Model.Languages" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                            }
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold d-block">
+                                        @Localizer["Attribute Name Translation"]<span class="text-primary">@Model.Name</span>
+                                    </label>
+                                    <input type="text" class="form-control" asp-for="TranslatedName" placeholder="@Localizer["Enter translation"]" aria-label="@Localizer["Enter translation"]" />
+                                    <span asp-validation-for="TranslatedName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <h5 class="mt-4">@Localizer["Values Translation"]</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>@Localizer["Original Value"]</th>
+                                            <th>@Localizer["Translated Value"]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Values.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>@Model.Values[i].OriginalText</td>
+                                                <td>
+                                                    <input type="hidden" name="Values[@i].ValueId" value="@Model.Values[i].ValueId" />
+                                                    <input type="text" name="Values[@i].TranslatedText" class="form-control"
+                                                           placeholder="@Localizer["Enter translation"]"
+                                                           value="@Model.Values[i].TranslatedText"
+                                                           style="min-width: 200px;" required />
+                                                    <span asp-validation-for="Values[i].TranslatedText" class="text-danger"></span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="d-flex justify-content-center mt-3">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="lni lni-save"></i> @Localizer["Save Translation"]
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

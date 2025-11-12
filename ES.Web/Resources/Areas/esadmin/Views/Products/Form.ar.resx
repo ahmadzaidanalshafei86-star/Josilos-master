@@ -1,0 +1,330 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Product" xml:space="preserve">
+    <value>المنتج</value>
+  </data>
+  <data name="Edit Product" xml:space="preserve">
+    <value>تعديل المنتج</value>
+  </data>
+  <data name="Add Product" xml:space="preserve">
+    <value>إضافة منتج</value>
+  </data>
+  <data name="Product title" xml:space="preserve">
+    <value>عنوان المنتج</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>الفئة</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>العلامة التجارية</value>
+  </data>
+  <data name="Select the brand" xml:space="preserve">
+    <value>اختر العلامة التجارية</value>
+  </data>
+  <data name="Short description" xml:space="preserve">
+    <value>وصف قصير</value>
+  </data>
+  <data name="Long description" xml:space="preserve">
+    <value>وصف طويل</value>
+  </data>
+  <data name="Cover image" xml:space="preserve">
+    <value>صورة الغلاف</value>
+  </data>
+  <data name="Featured image" xml:space="preserve">
+    <value>الصورة المميزة</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>مسح</value>
+  </data>
+  <data name="Video URL" xml:space="preserve">
+    <value>رابط الفيديو</value>
+  </data>
+  <data name="Video Preview" xml:space="preserve">
+    <value>معاينة الفيديو</value>
+  </data>
+  <data name="Meta Description" xml:space="preserve">
+    <value>وصف الميتا</value>
+  </data>
+  <data name="Meta Keywords" xml:space="preserve">
+    <value>كلمات الميتا</value>
+  </data>
+  <data name="Gallery images" xml:space="preserve">
+    <value>صور المعرض</value>
+  </data>
+  <data name="Product Data" xml:space="preserve">
+    <value>بيانات المنتج</value>
+  </data>
+  <data name="Product Type" xml:space="preserve">
+    <value>نوع المنتج</value>
+  </data>
+  <data name="Pricing" xml:space="preserve">
+    <value>التسعير</value>
+  </data>
+  <data name="Inventory" xml:space="preserve">
+    <value>المخزون</value>
+  </data>
+  <data name="Linked Products" xml:space="preserve">
+    <value>المنتجات المرتبطة</value>
+  </data>
+  <data name="Tabs" xml:space="preserve">
+    <value>التبويبات</value>
+  </data>
+  <data name="Attributes" xml:space="preserve">
+    <value>السمات</value>
+  </data>
+  <data name="Regular Price" xml:space="preserve">
+    <value>السعر العادي</value>
+  </data>
+  <data name="Sale Price" xml:space="preserve">
+    <value>سعر العرض</value>
+  </data>
+  <data name="Sale Schedule (Optional)" xml:space="preserve">
+    <value>جدولة التخفيض (اختياري)</value>
+  </data>
+  <data name="Sale Start Date" xml:space="preserve">
+    <value>تاريخ بدء العرض</value>
+  </data>
+  <data name="Sale End Date" xml:space="preserve">
+    <value>تاريخ انتهاء العرض</value>
+  </data>
+  <data name="Select sale start date" xml:space="preserve">
+    <value>اختر تاريخ بدء التخفيض</value>
+  </data>
+  <data name="Select sale end date" xml:space="preserve">
+    <value>اختر تاريخ انتهاء التخفيض</value>
+  </data>
+  <data name="Product Identification" xml:space="preserve">
+    <value>تحديد المنتج</value>
+  </data>
+  <data name="SKU" xml:space="preserve">
+    <value>رمز المنتج (SKU)</value>
+  </data>
+  <data name="GTIN (Optional)" xml:space="preserve">
+    <value>الرقم العالمي للمنتج (اختياري)</value>
+  </data>
+  <data name="Stock Management" xml:space="preserve">
+    <value>إدارة المخزون</value>
+  </data>
+  <data name="Enable Stock Management" xml:space="preserve">
+    <value>تمكين إدارة المخزون</value>
+  </data>
+  <data name="Stock Quantity" xml:space="preserve">
+    <value>الكمية في المخزون</value>
+  </data>
+  <data name="Low Stock Threshold" xml:space="preserve">
+    <value>حد انخفاض المخزون</value>
+  </data>
+  <data name="Allow Backorders?" xml:space="preserve">
+    <value>السماح بالطلبات المسبقة؟</value>
+  </data>
+  <data name="Select an option" xml:space="preserve">
+    <value>اختر خيارًا</value>
+  </data>
+  <data name="Stock Status" xml:space="preserve">
+    <value>حالة المخزون</value>
+  </data>
+  <data name="In Stock" xml:space="preserve">
+    <value>متوفر في المخزون</value>
+  </data>
+  <data name="Out of Stock" xml:space="preserve">
+    <value>غير متوفر في المخزون</value>
+  </data>
+  <data name="On Backorder" xml:space="preserve">
+    <value>متاح للطلب المسبق</value>
+  </data>
+  <data name="Selling Rules" xml:space="preserve">
+    <value>قواعد البيع</value>
+  </data>
+  <data name="Sold Individually" xml:space="preserve">
+    <value>يُباع بشكل فردي</value>
+  </data>
+  <data name="Exclude from Sold Out Badge" xml:space="preserve">
+    <value>استثناء من شارة نفاد المخزون</value>
+  </data>
+  <data name="Manage Linked Products" xml:space="preserve">
+    <value>إدارة المنتجات المرتبطة</value>
+  </data>
+  <data name="Filter by Category" xml:space="preserve">
+    <value>تصفية حسب الفئة</value>
+  </data>
+  <data name="All Categories" xml:space="preserve">
+    <value>جميع الفئات</value>
+  </data>
+  <data name="Select a category to filter available products." xml:space="preserve">
+    <value>حدد فئة لتصفية المنتجات المتاحة.</value>
+  </data>
+  <data name="Select Products" xml:space="preserve">
+    <value>اختر المنتجات</value>
+  </data>
+  <data name="Selected Products" xml:space="preserve">
+    <value>المنتجات المختارة</value>
+  </data>
+  <data name="Select Linked Products" xml:space="preserve">
+    <value>اختر المنتجات المرتبطة</value>
+  </data>
+  <data name="Search products..." xml:space="preserve">
+    <value>ابحث عن المنتجات...</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>اختيار</value>
+  </data>
+  <data name="Product Name" xml:space="preserve">
+    <value>اسم المنتج</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>إغلاق</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
+  <data name="Add New Tab" xml:space="preserve">
+    <value>إضافة Tab جديد</value>
+  </data>
+  <data name="Publish Description Tab" xml:space="preserve">
+    <value>نشر تبويب الوصف</value>
+  </data>
+  <data name="Enable this to show the Description Tab on the product page." xml:space="preserve">
+    <value>قم بتمكين هذا لإظهار تبويب الوصف في صفحة المنتج.</value>
+  </data>
+  <data name="Publish Review Tab" xml:space="preserve">
+    <value>نشر تبويب المراجعات</value>
+  </data>
+  <data name="Enable this to show the Review Tab on the product page." xml:space="preserve">
+    <value>قم بتمكين هذا لإظهار تبويب المراجعات في صفحة المنتج.</value>
+  </data>
+  <data name="Select Attributes" xml:space="preserve">
+    <value>اختر السمات</value>
+  </data>
+  <data name="Choose an attribute" xml:space="preserve">
+    <value>اختر سمة</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>صورة</value>
+  </data>
+  <data name="Publish ?" xml:space="preserve">
+    <value>نشر ؟</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>إرسال</value>
+  </data>
+</root>

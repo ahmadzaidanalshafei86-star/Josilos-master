@@ -1,0 +1,204 @@
+﻿@model SmtpSettingsViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = @Localizer["SMTP Settings"];
+    var currentLanguage = CultureInfo.CurrentCulture.Name;
+}
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="lni lni-cogs"></i> @Localizer["SMTP Configuration"]</h5>
+    </div>
+    <div class="card-body">
+        <form id="smtpForm" autocomplete="off">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">@Localizer["SMTP Host"]</label>
+                    <input type="text" class="form-control" asp-for="Host" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@Localizer["Port"]</label>
+                    <input type="number" class="form-control" asp-for="Port" required>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <label class="form-label">@Localizer["Email"]</label>
+                    <input type="email" class="form-control" autocomplete="new-email" asp-for="Email" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@Localizer["Password"]</label>
+                    <input type="password" class="form-control" asp-for="Password" autocomplete="new-password" required>
+                </div>
+            </div>
+
+            <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" id="EnableSsl" asp-for="EnableSsl">
+                <label class="form-check-label" for="EnableSsl">@Localizer["Enable SSL/TLS"]</label>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="lni lni-save"></i> @Localizer["Save Settings"]
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4 shadow-sm">
+    <div class="card-header bg-gradient-royal text-white">
+        <h5 class="mb-0"><i class="fas fa-paper-plane"></i> @Localizer["Test SMTP"]</h5>
+    </div>
+    <div class="card-body">
+        <div class="input-group">
+            <input type="email" id="testEmail" class="form-control" placeholder="@Localizer["Enter test email"]">
+            <button id="testSmtpBtn" class="btn btn-outline-secondary">
+                @Localizer["Send Test Email"]
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@currentLanguage';
+        const baseUrl = window.appBaseUrl || '/';
+
+        function getLocalizedMessage(key) {
+            var messages = {
+                "en-US": {
+                    "Success": "Success",
+                    "Error": "Error",
+                    "InvalidData": "Invalid data. Please check the fields.",
+                    "SmtpUpdated": "SMTP settings updated successfully!",
+                    "TestEmailSent": "Test email sent successfully!",
+                    "TestFailed": "SMTP Test Failed",
+                    "MissingSettings": "SMTP settings are missing.",
+                    "EnterEmail": "Please enter a test email address."
+                },
+                "ar-JO": {
+                    "Success": "نجاح",
+                    "Error": "خطأ",
+                    "InvalidData": "بيانات غير صالحة. يرجى التحقق من الحقول.",
+                    "SmtpUpdated": "تم تحديث إعدادات SMTP بنجاح!",
+                    "TestEmailSent": "تم إرسال البريد الإلكتروني التجريبي بنجاح!",
+                    "TestFailed": "فشل اختبار SMTP",
+                    "MissingSettings": "إعدادات SMTP مفقودة.",
+                    "EnterEmail": "يرجى إدخال عنوان بريد إلكتروني للاختبار."
+                }
+            };
+            return messages[currentLanguage] ? messages[currentLanguage][key] || key : key;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("smtpForm").addEventListener("submit", async function (event) {
+                event.preventDefault();
+                let formData = new FormData(event.target);
+                let jsonData = {};
+
+                formData.forEach((value, key) => {
+                    if (key === "EnableSsl") {
+                        jsonData[key] = document.getElementById(key).checked;
+                    } else if (key === "Port") {
+                        jsonData[key] = parseInt(value);
+                    } else {
+                        jsonData[key] = value;
+                    }
+                });
+
+                try {
+                    const saveUrl = `${baseUrl}EsAdmin/Smtp/Save`;
+                    let response = await fetch(saveUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(jsonData)
+                    });
+
+                    let data = await response.json();
+
+                    Swal.fire({
+                        icon: data.success ? "success" : "error",
+                        title: data.success ? getLocalizedMessage("Success") : getLocalizedMessage("Error"),
+                        text: data.message,
+                        position: "center"
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: getLocalizedMessage("Error"),
+                        text: error.message,
+                        position: "center"
+                    });
+                }
+            });
+        });
+
+               document.getElementById("testSmtpBtn").addEventListener("click", function () {
+            let testEmail = document.getElementById("testEmail").value.trim();
+
+            if (!testEmail) {
+                Swal.fire({
+                    icon: "warning",
+                    title: getLocalizedMessage("Error"),
+                    text: getLocalizedMessage("EnterEmail"),
+                    position: "center"
+                });
+                return;
+            }
+
+            // Show loading alert and disable the button
+            Swal.fire({
+                title: getLocalizedMessage("Sending"),
+                text: getLocalizedMessage("PleaseWait"),
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Disable button to prevent multiple clicks
+            let testButton = document.getElementById("testSmtpBtn");
+            testButton.disabled = true;
+            const TestUrl = `${baseUrl}EsAdmin/Smtp/TestSMTP` ;
+            fetch(TestUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: testEmail })
+            })
+            .then(response => response.text())
+            .then(text => text ? JSON.parse(text) : {})
+            .then(data => {
+                Swal.fire({
+                    icon: data.success ? "success" : "error",
+                    title: data.success ? getLocalizedMessage("Success") : getLocalizedMessage("Error"),
+                    text: data.message || getLocalizedMessage("UnexpectedError"),
+                    position: "center"
+                });
+            })
+            .catch(error => Swal.fire({
+                icon: "error",
+                title: getLocalizedMessage("Error"),
+                text: error.message,
+                position: "center"
+            }))
+            .finally(() => {
+                // Re-enable the button after the request is done
+                testButton.disabled = false;
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,156 @@
+﻿@model ProductTranslateFormViewModel
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Translations"];
+}
+
+@section Styles {
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @((Model.TranslationId > 0)
+                                ? Localizer["Edit Translation"]
+                                : Localizer["Add Translation"])
+                    </h6>
+                    <hr>
+                    <form asp-controller="ProductTranslates" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-3">
+                            @if (Model.TranslationId > 0)
+                            {
+                                <input type="hidden" asp-for="TranslationId" />
+                            }
+                            <input type="hidden" asp-for="ProductId" /> <!--To get The Product I am adding translation to -->
+                            @if (Model.TranslationId == 0)
+                            {
+                                <!-- Language -->
+                                <div class="col-6">
+                                    <label for="language" class="form-label">@Localizer["Language"]</label>
+                                    <select asp-for="LanguageId" asp-items="Model.Languages" class=" form-select">
+                                    </select>
+                                    <span asp-validation-for="LanguageId" class="text-danger"></span>
+                                </div>
+                            }
+                            <!-- Product title -->
+                            <div class="col-12">
+                                <label asp-for="Title" class="form-label">@Localizer["Product Title"]</label>
+                                <input asp-for="Title" class="form-control" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+
+                            <!-- Short Description -->
+                            <div class="col-md-6 col-12">
+                                <label asp-for="ShortDescription" class="form-label">@Localizer["Short Description"]</label>
+                                <textarea id="tinyMCEShortDesc" asp-for="ShortDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Long Description -->
+                            <div class="col-md-6 col-12">
+                                <label asp-for="LongDescription" class="form-label">@Localizer["Long Description"]</label>
+                                <textarea id="tinyMCELongDesc" asp-for="LongDescription" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="LongDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Meta Description -->
+                            <div class="col-md-6 col-12">
+                                <label asp-for="MetaDescription" class="form-label">@Localizer["Meta Description"]</label>
+                                <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Meta Keywords -->
+                            <div class="col-md-6 col-12">
+                                <label asp-for="MetaKeywords" class="form-label">@Localizer["Meta Keywords"]</label>
+                                <textarea asp-for="MetaKeywords" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaKeywords" class="text-danger"></span>
+                            </div>
+
+
+                            <!-- Tabs Translation Section -->
+                            <div class="p-3 rounded shadow-sm bg-light">
+                                <h6 class="text-bold fs-5 mb-2 text-primary">@Localizer["Tabs Translations"]</h6>
+                                <hr class="border-primary opacity-75" />
+
+                                @if (Model.ProductTabs.Count == 0)
+                                {
+                                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                        <small>@Localizer["This Product Has No Tabs"]</small>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="accordion mt-2" id="tabsAccordion">
+                                @for (int i = 0; i < Model.ProductTabs.Count; i++)
+                                {
+                                    var collapseId = $"collapseTab{i}";
+                                    var headingId = $"headingTab{i}"; 
+
+                                    <div class="accordion-item border shadow-sm mb-3">
+                                        <h2 class="accordion-header" id="@headingId">
+                                            <button class="accordion-button @(@i == 0 ? "" : "collapsed") fw-semibold text-dark bg-light"
+                                                    type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#@collapseId"
+                                                    aria-expanded="@(i == 0 ? "true" : "false")"
+                                                    aria-controls="@collapseId">
+                                                <i class="ph-translate me-2"></i> @Localizer["Translation for"] - @Model.ProductTabs[i].Title
+                                            </button>
+                                        </h2>
+                                        <div id="@collapseId" class="accordion-collapse collapse @(@i == 0 ? "show" : "")" aria-labelledby="@headingId" data-bs-parent="#tabsAccordion">
+                                            <div class="accordion-body p-4">
+                                                <div class="row g-3">
+                                                    <!-- Tab Title -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-semibold"><i class="ph-text me-1"></i> @Localizer["Tab Title"]</label>
+                                                        <input type="text" asp-for="ProductTabs[i].Title" class="form-control border-secondary" />
+                                                        <span asp-validation-for="ProductTabs[i].Title" class="text-danger"></span>
+                                                    </div>
+
+                                                    <!-- Tab Content (TinyMCE) -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-semibold"><i class="ph-file-text me-1"></i> @Localizer["Tab Content"]</label>
+                                                        <textarea class="form-control tinyMCE border-secondary" id="tinyMCE_@i" asp-for="ProductTabs[i].Content" rows="7"></textarea>
+                                                        <span asp-validation-for="ProductTabs[i].Content" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" asp-for="ProductTabs[i].Id" />
+                                    <input type="hidden" asp-for="ProductTabs[i].Order" />
+
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            initializeTinyMCE();
+        });
+    </script>
+}

@@ -1,0 +1,160 @@
+﻿@model IEnumerable<PageViewModel>
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = @Localizer["Pages"];
+}
+@section Styles {
+    <link href="~/CMS/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/CMS/css/translationindex.css" rel="stylesheet" />
+}
+
+
+<h6 class="mb-0 text-uppercase">@Localizer["Pages"]</h6>
+<hr />
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-3">
+                <a asp-controller="Pages" asp-action="Create" class="btn btn-success w-100 d-flex align-items-center justify-content-center">
+                    <ion-icon class="lni lni-plus me-2" style="font-size: 1.2rem;"></ion-icon>
+                    @Localizer["Add new page"]
+                </a>
+            </div>
+            <!-- Category Filter Dropdown -->
+            <div class="col-3">
+                <select id="categoryFilter" class="form-select">
+                    <option value="">@Localizer["All Categories"]</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Name">@category.Name</option>
+                    }
+                </select>
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+            <table id="table" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>@Localizer["Title"]</th>
+                        <th>@Localizer["Category"]</th>
+                        <th>@Localizer["Order"]</th>
+                        <th>@Localizer["Publishing"]</th>
+                        <th>@Localizer["Creation date"]</th>
+                        <th>@Localizer["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Title</td>
+                            <td>@item.CategoryName</td>
+                            <td class="position-relative">
+                                <input type="number"
+                                       class="form-control order-input"
+                                       value="@item.Order"
+                                       data-page-id="@item.Id"
+                                       data-original-value="@item.Order"
+                                       style="width: 80px;" />
+                                <span class="save-order ms-2"
+                                      data-page-id="@item.Id"
+                                      style="cursor: pointer; display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);">
+                                    <i class="lni lni-save"
+                                       style="font-size: 16px; color: #ffffff; background: #28a745; padding: 4px 6px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Save Order"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-@(item.IsPublished ? "success" : "danger")">
+                                    @(item.IsPublished ? @Localizer["Published"] : @Localizer["Not published"])
+                                </span>
+                            </td>
+                            <td>@item.CreatedDate.ToString()</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <!-- Edit Button -->
+                                    <a class="me-2"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title=@Localizer["Content managment"]
+                                       asp-controller="PagesTranslates" asp-action="Index" asp-route-pageId="@item.Id">
+                                        <ion-icon class="lni lni-pencil-alt md hover-scale text-warning" role="img"></ion-icon>
+                                    </a>
+
+                                    <a class="me-2"
+                                       target="_blank"
+                                       asp-controller="Page"
+                                       asp-action="Index" 
+                                       asp-route-slug="@item.Slug"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title="@Localizer["Preview"]">
+                                        <ion-icon class="lni lni-eye hover-scale md hover-scale text-info" role="img"></ion-icon>
+                                    </a>
+
+
+                                    <!-- Publish Button -->
+                                    <a class="me-2 toggle-status"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title=@(item.IsPublished ? @Localizer["Un-publish"] : @Localizer["Publish"])
+                                       data-page-id="@item.Id">
+                                        @if (item.IsPublished)
+                                        {
+                                            <ion-icon class="lni lni-download md hover-scale text-success" role="img"></ion-icon>
+                                        }
+                                        else
+                                        {
+                                            <ion-icon class="lni lni-upload md hover-scale text-success" role="img"></ion-icon>
+                                        }
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <a class="me-2"
+                                       onclick="deletePage('@item.Id', this)"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title=@Localizer["Delete page"]>
+                                        <i class="lni lni-trash md hover-scale text-danger"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <script src="~/CMS/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/CMS/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/CMS/assets/js/table-datatable.js"></script>
+}
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script>
+            // The hover of the buttons
+            document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all tooltips on the page
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    <script src="~/CMS/js/pageIndex.js"></script>
+}

@@ -1,0 +1,123 @@
+﻿@model CategoryWithPagesViewModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+
+@section Styles {
+   @*  <link href="~/WebSite/css/box.css" rel="stylesheet"> *@
+    <link href="~/WebSite/css-vedio/main.css" rel="stylesheet">
+
+    @if (System.Threading.Thread.CurrentThread.CurrentUICulture.Name.StartsWith("ar"))
+    {
+        <link href="~/WebSite/css/style-tabs-ar.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link href="~/WebSite/css/style-tabs.css" rel="stylesheet" />
+    }
+
+}
+
+
+<!--Title and breadCramp-->
+<div class="caption-inner" >
+
+    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+
+    {
+
+
+
+
+
+        <div class="inner-bg" style="background: url(@Url.Content("~/images/Categories/" + Model.CoverImageUrl)) no-repeat fixed center center;"></div>
+
+
+
+    }
+
+    else
+    {
+
+        <div class="inner-bg" style="background: url(WebSite/images/header2.jpg) no-repeat fixed center center;"></div>
+
+    }
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">@Localizer["Home"]</a></li>
+                    <li class="active">@Model.Name</li>
+                </ol>
+                <h3><span>@Model.Name</span></h3>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-inner">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+
+                    @if (Model.ThemeName == "list-1")
+                    {
+                        @if (!string.IsNullOrEmpty(Model.LongDescription))
+                        {
+                            <div class="col-md-9">
+                                @Html.Raw(Model.LongDescription)
+                            </div>
+                        }
+
+                        @await Html.PartialAsync($"_{Model.ThemeName}", Model.Pages)
+                    }
+                    else if (Model.ThemeName == "list-2")
+                    {
+
+                        @await Html.PartialAsync($"_{Model.ThemeName}", Model.Pages)
+
+                        @if (!string.IsNullOrEmpty(Model.LongDescription))
+                        {
+                            <div class="col-sm-8">
+                                @Html.Raw(Model.LongDescription)
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @await Html.PartialAsync($"_{Model.ThemeName}", Model.Pages)
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/WebSite/js-vedio/jquery.min.js"></script>
+    <script src="~/WebSite/js-vedio/jquery.fancybox.min.js"></script>
+    <script src="~/WebSite/js-vedio/global.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const coll = document.querySelectorAll(".collapsible");
+            coll.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    const content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+        });
+    </script>
+}

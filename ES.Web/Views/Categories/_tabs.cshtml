@@ -1,0 +1,36 @@
+﻿@model IEnumerable<PageViewModel>
+
+<div class="col-sm-12">
+    <div class="tabset">
+
+        @if (Model != null && Model.Any())
+        {
+            var index = 1;
+            // --- Tabs (Labels) ---
+            foreach (var Page in Model)
+            {
+                <input type="radio" name="tabset" id="tab@(index)" aria-controls="tab-panel-@(index)" @(index == 1 ? "checked" : null) />
+                <label for="tab@(index)">@Page.Title</label>
+                index++;
+            }
+
+            // Reset for content
+            index = 1;
+
+            <div class="tab-panels">
+                @foreach (var Page in Model)
+                {
+                    <section id="tab-panel-@(index)" class="tab-panel">
+                        @Html.Raw(Page.LongDescription)
+                    </section>
+                    index++;
+                }
+            </div>
+        }
+        else
+        {
+            <p>No pages available.</p>
+        }
+
+    </div>
+</div>

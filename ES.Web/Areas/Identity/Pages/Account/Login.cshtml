@@ -1,0 +1,116 @@
+﻿@page
+@model LoginModel
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="@CultureInfo.CurrentCulture.Name" dir="@(CultureInfo.CurrentCulture.Name.StartsWith("ar") ? "rtl" : "ltr")" class="light-theme">
+
+<head>
+    <base href="@Url.Content("~/")" />
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="~/CMS/favicon.ico">
+    <title>@Localizer["Login"] | ES</title>
+
+
+    <!-- plugins -->
+    <link href="@Url.Content("~/CMS/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css")" rel="stylesheet" />
+
+    <!-- CSS Files -->
+    <link href="@Url.Content("~/CMS/assets/css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CMS/assets/css/bootstrap-extended.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CMS/assets/css/style.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/CMS/assets/css/icons.css")" rel="stylesheet" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+
+</head>
+
+<body>
+    <div class="login-bg-overlay au-sign-in-basic"></div>
+    <!--start wrapper-->
+    <div class="wrapper">
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light bg-white p-3">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-start">
+                        <a href="https://www.es.jo/" target="_blank" rel="noopener noreferrer">
+                            <img src="@($"{HttpContextAccessor.HttpContext!.Request.PathBase}/CMS/assets/images/icons/ESjo_logo-02.png")"
+                            class="logo-icon img-fluid"
+                            alt="ES Logo"
+                            style="width: 140px; max-width: 100%; height: 52px;">
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-4 col-lg-5 col-md-7 mx-auto mt-5">
+                    <div class="card radius-10">
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <h4>@Localizer["Login"]</h4>
+                                <p>@Localizer["Login to your account"]</p>
+                            </div>
+                            <form id="account" method="post" class="form-body row g-3">
+                                <div class="col-12">
+                                    <label asp-for="Input.Username" class="form-label">@Localizer["Username"]</label>
+                                    <input asp-for="Input.Username" class="form-control" id="inputEmail" placeholder="@Localizer["Your user name"]">
+                                    <span asp-validation-for="Input.Username" class="text-danger"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Input.Password" class="form-label">@Localizer["Password"]</label>
+                                    <input asp-for="Input.Password" type="password" class="form-control" id="inputPassword" placeholder="@Localizer["Your password"]">
+                                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-check form-switch">
+                                        <label asp-for="Input.RememberMe" class="form-check-label">
+                                            <input class="form-check-input" asp-for="Input.RememberMe" />
+                                            @Localizer["Remember Me"]
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-12">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">@Localizer["Login"]</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end wrapper-->
+
+    <script src="@Url.Content("~/CMS/assets/js/bootstrap.bundle.min.js")"></script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

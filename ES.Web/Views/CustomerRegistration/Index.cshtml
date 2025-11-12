@@ -1,0 +1,225 @@
+﻿@model ES.Web.Models.CustomerRegistrationViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+@{
+    var currentCulture = CultureInfo.CurrentCulture.Name;
+    var isArabic = currentCulture.StartsWith("ar", System.StringComparison.OrdinalIgnoreCase);
+}
+
+<div class="caption-inner">
+    <div class="inner-bg" style="background: url('/WebSite/images/header2.jpg') no-repeat center center / cover;"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-center text-light py-4">
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a href="/">@Localizer["Home"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["Commercial Registration"]</li>
+                </ol>
+                <h3 class="fw-bold">@Localizer["Commercial Registration"]</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content-inner py-5" dir="@(isArabic ? "rtl" : "ltr")">
+    <div class="container">
+        <form asp-action="Register" asp-controller="Company" method="post" enctype="multipart/form-data" id="customerRegistrationForm">
+            <div class="row">
+                <!-- User Type -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["User Type"]</label>
+                        <select asp-for="UserType" class="form-control" id="UserType">
+                            <option value="1">@Localizer["Company"]</option>
+                            <option value="2">@Localizer["Person"]</option>
+                        </select>
+                        <span asp-validation-for="UserType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Company Name / Full Name -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label id="lblFullName">@Localizer["Company Name"] *</label>
+                        <input asp-for="CompanyName" class="form-control" />
+                        <span asp-validation-for="CompanyName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Company Sector -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["Company Sector"]</label>
+                        <select asp-for="CompanySector" class="form-control">
+                            <option value="1">@Localizer["Public"]</option>
+                            <option value="2">@Localizer["Private"]</option>
+                        </select>
+                        <span asp-validation-for="CompanySector" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Registration Number -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["Registration Number"]</label>
+                        <input asp-for="RegistrationNumber" class="form-control" />
+                        <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["Telephone Number"] *</label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Fax -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["Fax"]</label>
+                        <input asp-for="Fax" class="form-control" />
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["Email"] *</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Website -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>@Localizer["Website"]</label>
+                        <input asp-for="Website" class="form-control" />
+                        <span asp-validation-for="Website" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Materials -->
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>@Localizer["Select Materials"]</label>
+                        <input type="text" id="txtSearching" class="form-control" placeholder="@Localizer["Search for materials..."]" />
+                        <div id="materials-list" class="mt-2">
+                            @foreach (var item in Model.AvailableMaterials)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input material-checkbox" type="checkbox" name="SelectedMaterials" value="@item.Id" />
+                                    <label class="form-check-label">@item.Name</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Materials -->
+                <div class="col-md-4" id="divOther" style="display:none">
+                    <div class="form-group">
+                        <label>@Localizer["Other Materials"]</label>
+                        <input asp-for="OtherMaterials" class="form-control" />
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>@Localizer["Detailed Address"]</label>
+                        <textarea asp-for="Address" rows="5" class="form-control"></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- File Uploads -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Localizer["Commercial Register (required)"]</label>
+                        <input asp-for="CommercialRegisterFile" type="file" class="form-control" />
+                        <span asp-validation-for="CommercialRegisterFile" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Localizer["Registration Certificate (optional)"]</label>
+                        <input asp-for="RegistrationCertificateFile" type="file" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Localizer["Professions License (optional)"]</label>
+                        <input asp-for="ProfessionsLicenseFile" type="file" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Localizer["Client List (optional)"]</label>
+                        <input asp-for="ClientListFile" type="file" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>@Localizer["Achievements List (optional)"]</label>
+                        <input asp-for="AchievementsFile" type="file" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google reCAPTCHA -->
+            <div class="row mt-3">
+                <div class="col-md-5">
+                    <div class="g-recaptcha" data-sitekey="6LctxaEnAAAAAFZkdgzWhcLWX3Mm4beckiCwBEsS"></div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="row mt-4">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn btn-primary">@Localizer["Register"]</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Filter materials dynamically
+            $('#txtSearching').on('input', function () {
+                var search = $(this).val().toUpperCase();
+                $('#materials-list label').each(function () {
+                    var text = $(this).text().toUpperCase();
+                    $(this).closest('.form-check').toggle(text.indexOf(search) >= 0);
+                });
+            });
+
+            // Show 'Other Materials' if "Other" checkbox selected
+            $('.material-checkbox').change(function () {
+                var showOther = $('.material-checkbox:checked').filter(function () {
+                    return $(this).next('label').text().toLowerCase().includes('other');
+                }).length > 0;
+                $('#divOther').toggle(showOther);
+            });
+
+            // Change label for Company/Person dynamically
+            $('#UserType').change(function () {
+                $('#lblFullName').text($(this).val() == '2' ? '@Localizer["Full Name"] *' : '@Localizer["Company Name"] *');
+            });
+        });
+    </script>
+}

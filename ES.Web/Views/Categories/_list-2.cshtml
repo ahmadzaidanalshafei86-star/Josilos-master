@@ -1,0 +1,14 @@
+﻿@model IEnumerable<PageViewModel>
+
+<div class="col-md-4">
+    <div class="menu-left">
+        <ul>
+            @foreach (var Page in Model)
+            {
+                <a href="@Page.LinkUrl">
+                <li><i class="fas fa-chevron-right"></i>@Page.Title</li>
+                </a>
+            }
+        </ul>
+    </div>
+</div>

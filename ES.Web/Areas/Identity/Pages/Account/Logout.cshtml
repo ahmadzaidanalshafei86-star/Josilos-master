@@ -1,0 +1,54 @@
+﻿@page
+@model LogoutModel
+@{
+    ViewData["Title"] = "Log out";
+    Layout = "_MyLayout";
+}
+
+<div class="row">
+    <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12 mx-auto">
+        <div class="card shadow-lg border-0">
+            <div class="card-body">
+                <div class="text-center">
+                    <h5 class="text-uppercase font-weight-bold">Log Out</h5>
+                    <hr class="my-4" />
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <div class="d-flex justify-content-center gap-4 align-items-center">
+                            <i class="fas fa-sign-out-alt fa-2x text-warning"></i>
+                            <h6 class="mb-0">Are you sure you want to log out?</h6>
+                        </div>
+                        <div class="d-flex justify-content-center gap-4 mt-4">
+                            <!-- 'Yes' button with confirmation -->
+                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                                <button type="submit" class="btn btn-danger btn-lg px-4 py-2">
+                                    <div class="d-flex justify-content-center align-items-center w-100">
+                                    Yes
+                                    </div>
+                                </button>
+                            </form>
+                            <!-- 'No' button to cancel -->
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary btn-lg px-4 py-2">
+                                <div class="d-flex justify-content-center align-items-center w-100">
+                                No
+                                </div>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success mt-4" role="alert">
+                            <i class="fas fa-check-circle"></i> You have successfully logged out of the application.
+                        </div>
+                        <!-- Return home button -->
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg mt-3">
+                            <div class="d-flex justify-content-center align-items-center w-100">
+                                <i class="fas fa-home me-2"></i> Return to Home
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

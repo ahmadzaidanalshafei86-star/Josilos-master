@@ -1,0 +1,84 @@
+﻿@model BrandFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Brand"];
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-3 text-uppercase">
+                        @((Model.Id > 0) ? Localizer["Edit Brand"] : Localizer["Add Brand"])
+                    </h6>
+                    <hr>
+
+                    <form id="brandForm" method="post" enctype="multipart/form-data" asp-controller="Brands">
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+
+                        <div class="row g-3">
+                            <!-- Brand Name -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Brand Name"] <span class="text-danger">*</span></label>
+                                <input asp-for="Name" class="form-control col-6" required />
+                                <span class="text-danger d-block mt-1" asp-validation-for="Name"></span>
+                            </div>
+
+                            <!-- Logo Upload & Preview -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Brand Logo"]</label>
+                                <div class="d-flex align-items-center">
+                                    <input asp-for="Logo"
+                                           type="file"
+                                           class="form-control"
+                                           id="Logo"
+                                           accept="image/*"
+                                           onchange="previewImage(event, 'LogoPreview')" />
+                                    <button type="button" class="btn btn-outline-danger btn-sm ms-2" onclick="clearFileInput('Logo', 'LogoPreview')">
+                                        @Localizer["Clear"]
+                                    </button>
+                                </div>
+                                <span class="text-danger d-block mt-1" asp-validation-for="Logo"></span>
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-center justify-content-center">
+                                <img id="LogoPreview"
+                                     src="@(!string.IsNullOrEmpty(Model?.LogoUrl) ? @Url.Content($"~/images/Brands/{Model.LogoUrl}") : Url.Content("/images/logo-placeholder.png"))"
+                                     alt="@Model.LogoAltName"
+                                     class="img-fluid rounded shadow"
+                                     style="width: 150px; height: 150px; object-fit: contain; background: #f8f9fa; border: 1px solid #ddd; padding: 5px;" />
+                            </div>
+
+                            <!-- Is Published -->
+                            <div class="col-12 mt-3">
+                                <div class="form-check">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish ?"]</label>
+                                </div>
+                                <span class="text-danger d-block mt-1" asp-validation-for="IsActive"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/BrandForm.js"></script>
+}

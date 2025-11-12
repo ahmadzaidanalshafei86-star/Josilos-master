@@ -1,0 +1,37 @@
+﻿.mj-sitemap {
+  position: relative;
+}
+.mj-sitemap,
+.mj-sitemap ul {
+  list-style: none;
+}
+.mj-sitemap li {
+  position: relative;
+  padding: 1em;
+}
+.mj-sitemap li:after, .mj-sitemap li:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-width: 1px;
+  z-index: 0;
+}
+.mj-sitemap li:before 
+{
+    position: absolute;
+    top: 0;
+    left: -1.1em;
+    height: 100%;
+    border-top-style: none;
+    border-right-style: solid;
+}
+.mj-sitemap li:after {
+  top: 1.5em;
+  left: -1.1em;
+  width: 1.5em;
+  border-top-style: solid;
+}
+.mj-sitemap li:last-child:before {
+  border-left: none;
+}

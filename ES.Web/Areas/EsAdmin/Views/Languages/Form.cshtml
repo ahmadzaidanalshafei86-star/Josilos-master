@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Add Language";
+}
+
+@section Styles {
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--bootstrap-5 .select2-selection {
+            border-radius: 0.375rem;
+        }
+
+        .form-control-feedback {
+            font-size: 0.875rem;
+            color: red;
+        }
+    </style>
+}
+
+<!-- Language form -->
+<form asp-action="Add" method="post" novalidate>
+    <div class="form-group row">
+        <div class="col-md-6">
+            <label for="language" class="form-label">Select Language</label>
+            <select id="language" name="code" class="form-select" required>
+                <option value="" disabled selected>Select a language...</option>
+                @foreach (var language in ViewBag.LanguageDropdown as List<SelectListItem>)
+                {
+                    <option value="@language.Value">@language.Text</option>
+                }
+            </select>
+            <div class="invalid-feedback">Please select a language.</div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary btn-lg">Add Language</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 with custom options and enable search functionality
+            $('#language').select2({
+                placeholder: "Select a language...",
+                allowClear: true,
+                theme: "bootstrap-5",
+                width: '100%',
+                minimumResultsForSearch: 10,  // Enable search after 10 options (you can set this value based on your needs)
+                dropdownAutoWidth: true,
+                templateResult: function (state) {
+                    if (!state.id) { return state.text; }
+                    return $('<span><i class="fas fa-language"></i> ' + state.text + '</span>');
+                }
+            });
+
+            // Form validation (custom for Select2)
+            $('form').on('submit', function (e) {
+                if (!$('#language').val()) {
+                    e.preventDefault();
+                    $('#language').addClass('is-invalid');
+                }
+            });
+
+            // Custom tooltip on select
+            $('#language').on('select2:open', function () {
+                $('#language').attr('title', 'Please select a language');
+            });
+        });
+    </script>
+}

@@ -1,0 +1,22 @@
+﻿.carousel img {
+  width: 100%;
+}
+
+.carousel-1
+{
+	height:600px;
+	object-fit:cover;
+}
+
+
+.carousel-2
+{
+	height:250px;
+	object-fit:cover;
+}
+
+.d-md-block h3
+{
+	font-size:44px;
+	color:#FFFFFF;
+}

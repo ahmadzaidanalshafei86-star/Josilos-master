@@ -1,0 +1,29 @@
+﻿.order-card.new-order {
+    animation: flash 1s ease-in-out 3;
+}
+
+.order-card.new-order-fallback {
+    animation: flash-fallback 1s ease-in-out 5;
+}
+
+@keyframes flash {
+    0%, 100% {
+        background-color: inherit;
+    }
+
+    50% {
+        background-color: #ffeb3b;
+    }
+    /* Yellow flash */
+}
+
+@keyframes flash-fallback {
+    0%, 100% {
+        background-color: inherit;
+    }
+
+    50% {
+        background-color: #ff6666;
+    }
+    /* Red flash for fallback */
+}

@@ -1,0 +1,94 @@
+﻿@model MaterialTranslatesViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@section Styles {
+    <link href="~/CMS/css/translationindex.css" rel="stylesheet" />
+}
+
+@{
+    ViewData["Title"] = Localizer["Material translates"];
+}
+<div id="translations-section" class="container py-4">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-bold d-flex align-items-center">
+            <img src="~/CMS/assets/images/icons/translate.png"
+                 alt="Translations Icon"
+                 class="me-2 img-fluid"
+                 style="width: 32px; height: auto; max-width: 100%;">
+            @Localizer["Material Translates"]
+        </h5>
+        <!-- 1 refers to number of avalbile lang more english -->
+        @if (Model.PreEnteredTranslations?.Count() < 1)
+        {
+            <a asp-action="Create" asp-route-materialId="@Model.MaterialId" class="btn btn-success d-flex align-items-center">
+                <i class="lni lni-plus me-2" style="font-size: 1.2rem;"></i>
+                @Localizer["Add Translation"]
+            </a>
+        }
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table">
+            <thead>
+                <tr>
+                    <th>@Localizer["Name"]</th>
+                    <th>@Localizer["Language"]</th>
+                   
+                    <th>@Localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold">@Model.MaterialName</td>
+                    <td class="text-muted">@Localizer[Model.MaterialDefaultLang!] / @Localizer["default language"]</td>
+                   
+                    <td>
+                        <a asp-controller="Materials" asp-action="Edit" asp-route-id="@Model.MaterialId" class="me-2" title="@Localizer["Edit"]">
+                            <ion-icon class="lni lni-pencil hover-scale text-primary"></ion-icon>
+                        </a>
+                        <a asp-controller="Materials" asp-action="Edit" asp-route-id="@Model.MaterialId" class="me-2" title="@Localizer["View"]">
+                            <ion-icon class="lni lni-eye hover-scale text-success" style="background: none;"></ion-icon>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model.PreEnteredTranslations is not null)
+                {
+                    @foreach (var translate in Model.PreEnteredTranslations)
+                    {
+                        <tr>
+                            <td class="fw-bold">@translate.Name</td>
+                            <td class="text-muted">@Localizer[@translate.Language.Code]</td>
+                           
+                            <td>
+                                <a asp-controller="MaterialsTranslates" asp-action="Edit" asp-route-materialId="@Model.MaterialId" asp-route-Translateid="@translate.Id" class="me-2" title="@Localizer["Edit"]">
+                                    <ion-icon class="lni lni-pencil hover-scale text-primary"></ion-icon>
+                                </a>
+                                <a asp-controller="MaterialsTranslates" asp-action="Edit" asp-route-materialId="@Model.MaterialId" asp-route-Translateid="@translate.Id" class="me-2" title="@Localizer["View"]">
+                                    <ion-icon class="lni lni-eye hover-scale text-success"></ion-icon>
+                                </a>
+                                <a href="javascript:;" onclick="deleteTranslation('@translate.Id','@Model.MaterialId', this)" class="me-2" title="@Localizer["Delete"]">
+                                    <ion-icon class="lni lni-trash hover-scale text-danger"></ion-icon>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script src="~/CMS/js/materialTranslates.js"></script>
+}
+
+
+

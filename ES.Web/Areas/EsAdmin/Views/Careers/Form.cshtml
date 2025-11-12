@@ -1,0 +1,120 @@
+﻿@model CareerFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Career"];
+    // Define employment type options
+    var employmentTypes = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "FullTime", Text = Localizer["Full Time"].Value },
+        new SelectListItem { Value = "PartTime", Text = Localizer["Part Time"].Value },
+        new SelectListItem { Value = "Contract", Text = Localizer["Contract"].Value },
+        new SelectListItem { Value = "Internship", Text = Localizer["Internship"].Value }
+    };
+
+    // Define enviroment Type options
+    var enviromentTypes = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "On Sight", Text = Localizer["On Site"].Value },
+        new SelectListItem { Value = "Remotely", Text = Localizer["Remotely"].Value },
+        new SelectListItem { Value = "Remotely", Text = Localizer["Hybrid"].Value },
+    };
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-3 text-uppercase">
+                        @((Model.Id > 0) ? Localizer["Edit Career"] : Localizer["Add Career"])
+                    </h6>
+                    <hr>
+
+                    <form id="CareerForm" method="post" asp-controller="Careers">
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+
+                        <div class="row g-3">
+                            <!-- Career Name -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Career Name"] <span class="text-danger">*</span></label>
+                                <input asp-for="JobTitle" class="form-control col-6" required />
+                                <span class="text-danger d-block mt-1" asp-validation-for="JobTitle"></span>
+                            </div>
+
+                            <!-- Reference Number -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Reference Number"] </label>
+                                <input asp-for="RefNumber" class="form-control col-6" />
+                                <span class="text-danger d-block mt-1" asp-validation-for="RefNumber"></span>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Description"]</label>
+                                <textarea asp-for="Description" id="tinyMCEDesc" class="form-control" rows="4"></textarea>
+                                <span class="text-danger d-block mt-1" asp-validation-for="Description"></span>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Location"]</label>
+                                <input asp-for="Location" class="form-control col-6"/>
+                                <span class="text-danger d-block mt-1" asp-validation-for="Location"></span>
+                            </div>
+
+                            <!-- Employment Type -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Employment Type"]</label>
+                                <select asp-for="EmploymentType" class="form-control" asp-items="employmentTypes">
+                                    
+                                </select>
+                                <span class="text-danger d-block mt-1" asp-validation-for="EmploymentType"></span>
+                            </div>
+
+                            <!-- enviroment Type -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Environment Type"]</label>
+                                <select asp-for="EnviromentType" class="form-control" asp-items="enviromentTypes">
+                                </select>
+                                <span class="text-danger d-block mt-1" asp-validation-for="EnviromentType"></span>
+                            </div>
+
+                          @*   <!-- Salary -->
+                            <div class="col-12">
+                                <label class="form-label">@Localizer["Salary"]</label>
+                                <input asp-for="Salary" class="form-control col-6" type="number" step="0.01" />
+                                <span class="text-danger d-block mt-1" asp-validation-for="Salary"></span>
+                            </div> *@
+
+                            <!-- Is Published -->
+                            <div class="col-12 mt-3">
+                                <div class="form-check">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish ?"]</label>
+                                </div>
+                                <span class="text-danger d-block mt-1" asp-validation-for="IsActive"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+}

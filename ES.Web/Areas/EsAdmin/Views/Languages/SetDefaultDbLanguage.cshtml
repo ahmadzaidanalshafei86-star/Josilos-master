@@ -1,0 +1,79 @@
+﻿@model LanguageSelectionViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Default language"];
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm rounded-3">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-3">
+                <h4 class="mb-0">@Localizer["Default language"]</h4>
+
+                @if(User.IsInRole(AppRoles.SuperAdmin))
+                {
+                <!-- Add Language Button -->
+                <a asp-action="Add" class="btn btn-success d-flex align-items-center justify-content-center rounded-3 px-4 py-2 shadow-sm">
+                    <ion-icon class="lni lni-plus me-2" style="font-size: 1.2rem;"></ion-icon>
+                    @Localizer["Add Language"]
+                </a>
+                }
+            </div>
+
+            <div class="card-body">
+                <div class="border p-4 rounded-3 shadow-sm">
+                    <h6 class="mb-3 text-uppercase">@Localizer["Change language"]</h6>
+                    <hr>
+                    <form id="languageForm" asp-controller="Languages" asp-action="SetDefaultDbLanguage" method="post" class="mt-4">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-4">
+                            <div class="row justify-content-center">
+                                <div class="col-12">
+                                    <div class="d-flex flex-column gap-3">
+                                        @for (int i = 0; i < Model.Languages.Count(); i++)
+                                        {
+                                            <div class="form-check">
+                                                <input type="radio"
+                                                       class="form-check-input rounded-2"
+                                                       name="SelectedLanguageCode"
+                                                       id="language-@i"
+                                                       value="@Model.Languages[i].Code"
+                                                @(Model.SelectedLanguageCode == Model.Languages[i].Code ? "checked" : "") />
+                                                <label class="form-check-label" for="language-@i">
+                                                    @Localizer[Model.Languages[i].Name]
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success d-flex align-items-center">
+                            <i class="lni lni-save me-2"></i>@Localizer["Save Default Language"]
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function handleCheckboxClick(clickedCheckbox) {
+            // Get all checkboxes with the same name
+            const checkboxes = document.querySelectorAll('input[name="SelectedLanguageCode"]');
+
+            // Uncheck all other checkboxes
+            checkboxes.forEach(checkbox => {
+                if (checkbox !== clickedCheckbox) {
+                    checkbox.checked = false;
+                }
+            });
+        }
+    </script>
+}

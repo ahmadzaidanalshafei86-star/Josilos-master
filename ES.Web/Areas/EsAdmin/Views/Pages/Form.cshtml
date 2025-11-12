@@ -1,0 +1,335 @@
+﻿@model PageFormViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["Page"];
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/CMS/lib/dropzone/dropzone.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+}
+
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @((Model.Id > 0)
+                            ? Localizer["Edit page"]
+                            : Localizer["Add page"])
+                    </h6>
+                    <hr>
+                    <form id="my-Form" method="post" enctype="multipart/form-data" asp-controller="Pages">
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+                        <div class="row g-3">
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label class="form-label"> @Localizer["Category"]<span style="color: red;">*</span></label>
+                                <select id="CategoryDropdown" asp-for="CategoryId" asp-items="Model.Categories" class="form-select" required>
+                                    <option value="" disabled selected></option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                            <!-- Add a hidden input to store the category IDs -->
+                            <input type="hidden" id="categoryIds" value='@Html.Raw(Json.Serialize(Model.DisabledOrderCategories))' />
+
+                            <!--Relate Caregories-->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Related categories"]</label>
+                                <select id="relatedCategoriesDropdown"
+                                        asp-for="RelatedCategoryIds" asp-items="Model.Categories"
+                                        multiple="multiple"
+                                        class="form-select">
+                                </select>
+                                <span asp-validation-for="RelatedCategoryIds" class="text-danger"></span>
+                            </div>
+
+                            <!-- Page title -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Page title"]<span style="color: red;">*</span></label>
+                                <input asp-for="Title" class="form-control" required />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+
+                            <!-- Date Input with -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Date"]</label>
+                                <div class="input-group">
+                                    <input asp-for="DateInput" type="date" class="form-control" placeholder="Select date">
+                                </div>
+                            </div>
+
+                            <!--counter-->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Count"]</label>
+                                <div class="input-group">
+                                    <input asp-for="Count" type="number" class="form-control" placeholder="enter count or number">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6"></div>
+
+                            <!-- Short Description -->
+                            <div class="col-md-6">
+                                <label class="form-label ">@Localizer["Short description"]</label>
+                                <textarea id="tinyMCEShortDesc" asp-for="ShortDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Long Description -->
+                            <div class="col-md-6">
+                                <label class="form-label ">@Localizer["Long description"]</label>
+                                <textarea id="tinyMCELongDesc" asp-for="LongDescription" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="LongDescription" class="text-danger"></span>
+                            </div>
+
+                            <!--Images-->
+                            <div class="row p-3">
+                                <!-- Cover Image Section -->
+                                <div class="col-md-6">
+                                    <label class="form-label">@Localizer["Cover image"]</label>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <input asp-for="CoverImage"
+                                               type="file"
+                                               class="form-control"
+                                               id="CoverImage"
+                                               accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                               data-hidden-input-id="KeepCoverImage"
+                                               onchange="previewImage(event, 'CoverImagePreview')" />
+
+                                        <!-- Clear button for input -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearCoverImage">
+                                            @Localizer["Clear"]
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <img id="CoverImagePreview"
+                                             src="@(!string.IsNullOrEmpty(Model.CoverImageUrl) ? @Url.Content($"~/images/Pages/{Model.CoverImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                             alt="Cover Image"
+                                             class="img-fluid rounded shadow"
+                                             style="max-width: 100%; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                    <span asp-validation-for="CoverImage" id="coverImageError" class="text-danger"></span>
+                                    <input type="hidden" asp-for="CoverImageUrl" value="@Model.CoverImageUrl" />
+
+                                    <!-- Hidden input to track whether to keep the image -->
+                                    <input type="hidden" id="KeepCoverImage" asp-for="@Model.KeepCoverImage" value="true" />
+                                </div>
+
+                                <!-- Featured Image Section -->
+                                <div class="col-md-6">
+                                    <label class="form-label">@Localizer["Featured image"]</label>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <input asp-for="FeaturedImage"
+                                               type="file"
+                                               class="form-control"
+                                               id="FeaturedImage"
+                                               accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                               data-hidden-input-id="KeepFeaturedImage"
+                                               onchange="previewImage(event, 'FeaturedImagePreview')" />
+
+                                        <!-- Clear button for input -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearFeaturedImage">
+                                            @Localizer["Clear"]
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <img id="FeaturedImagePreview"
+                                             src="@(!string.IsNullOrEmpty(Model.FeaturedImageUrl) ? @Url.Content($"~/images/Pages/{Model.FeaturedImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                             alt="Featured Image"
+                                             class="img-fluid rounded shadow"
+                                             style="max-width: 100%; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                    <span asp-validation-for="FeaturedImage" id="featuredImageError" class="text-danger"></span>
+                                    <input type="hidden" asp-for="FeaturedImageUrl" value="@Model.FeaturedImageUrl" />
+
+                                    <!-- Hidden input to track whether to keep the image -->
+                                    <input asp-for="@Model.KeepFeaturedImage" type="hidden" id="KeepFeaturedImage" value="true" />
+                                </div>
+                            </div>
+
+                            <!-- Video URL -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Video URL"]</label>
+                                <input type="text" asp-for="VideoURL" class="form-control" oninput="updateVideoPreview(this.value)" />
+                                <span asp-validation-for="VideoURL" class="text-danger"></span>
+                            </div>
+
+                            <!-- Video Preview -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Video Preview"]</label>
+                                <div class="ratio ratio-16x9">
+                                    <iframe id="videoPreview" src="" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Meta Description -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Description"]</label>
+                                <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Meta Keywords -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Keywords"]</label>
+                                <textarea asp-for="MetaKeywords" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaKeywords" class="text-danger"></span>
+                            </div>
+
+                            <!-- Order -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Order"]</label>
+                                <input asp-for="Order" type="number" class="form-control" id="OrderInput" />
+                                <span asp-validation-for="Order" class="text-danger"></span>
+                            </div>
+
+                            <!-- Word and PDF Files -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Upload Files"]</label>
+                                <div id="docDropzone" class="dropzone">
+                                    <div id="sortableDocPreviews"></div>
+                                </div>
+                            </div>
+
+                            <!-- Gallery Style -->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Gallery style"]</label>
+                                <select asp-for="GalleryStyle" asp-items="Model.GalleryStyles" class="form-select"></select>
+                                <span asp-validation-for="GalleryStyle" class="text-danger"></span>
+                            </div>
+
+                            <!--Gallery Images-->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Gallery images"]</label>
+                                <div id="myDropzone" class="dropzone">
+                                    <div id="sortablePreviews"></div>
+                                </div>
+                            </div>
+
+                            <!-- Link to -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Link to:"]</label>
+
+                                <!-- to save current LinkToType value (only for editing) -->
+                                <input asp-for="LinkToType" type="hidden" id="LinkToType" />
+
+                                <!-- Radio Buttons -->
+                                <div class="form-check">
+                                    <input type="radio" name="option" id="radio1" class="form-check-input" value="1" checked />
+                                    <label for="radio1" class="form-check-label">@Localizer["Page"]</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" name="option" id="radio2" class="form-check-input" value="2" />
+                                    <label for="radio2" class="form-check-label">@Localizer["Category"]</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" name="option" id="radio3" class="form-check-input" value="3" />
+                                    <label for="radio3" class="form-check-label">@Localizer["File"]</label>
+                                </div>
+                                <!-- New Radio Button for Text Input -->
+                                <div class="form-check">
+                                    <input type="radio" name="option" id="radio4" class="form-check-input" value="4" />
+                                    <label for="radio4" class="form-check-label">@Localizer["Another link"]</label>
+                                </div>
+
+                                <!-- Dropdowns for Option 2 and Option 3 -->
+                                <div id="dropdown2" class="mt-2 d-none">
+                                    <label class="form-label">@Localizer["Choose a category :"]</label>
+                                    <select id="LinkToCategoryDropdown" class="form-control">
+                                        <option value="">-- Select --</option>
+                                        @foreach (var item in Model.LinkToCategories)
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div id="dropdown3" class="mt-2 d-none">
+                                    <label class="form-label">@Localizer["Choose a file :"]</label>
+                                    <select id="FileDropdown" class="form-control">
+                                        <option value="">-- Select --</option>
+                                        @foreach (var item in Model.LinkToFiles)
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Input Field for Option 4 -->
+                                <div id="textInputDiv" class="mt-2 d-none">
+                                    <label class="form-label">@Localizer["Enter a URL"]</label>
+                                    <input type="text" id="textInput" class="form-control" placeholder="Enter a URL" />
+                                </div>
+
+                                <!-- Hidden field to store the value of LinkTo -->
+                                <input asp-for="LinkTo" type="hidden" id="LinkTo" name="LinkTo" />
+                            </div>
+
+                            <!-- Form Dropdown -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Associated Form"]</label>
+                                <select id="FormDropdown" asp-for="FormId" asp-items="Model.Forms" class="form-select">
+                                    <option value="">@Localizer["None"]</option>
+                                </select>
+                                <span asp-validation-for="FormId" class="text-danger"></span>
+                            </div>
+
+
+                            <!-- Is Published -->
+                            <div class="col-lg-12">
+                                <div class="form-check">
+                                    <input asp-for="IsPublished" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish ?"]</label>
+                                </div>
+                                <span asp-validation-for="IsPublished" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    var existingGalleryImages = Model.ExistingGalleryImages;
+    var existingDocuments = Model.ExistingFiles;
+    var DisabledOrderCategories = Model.DisabledOrderCategories;
+}
+@section Plugins {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+    <script src="~/CMS/lib/dropzone/dropzone.min.js"></script>
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+   
+    <script> var existingGalleryImages = @Html.Raw(Json.Serialize(existingGalleryImages));</script>
+    <script> var existingDocuments = @Html.Raw(Json.Serialize(existingDocuments));</script>
+    <script> var DisabledOrderCategories = @Html.Raw(Json.Serialize(DisabledOrderCategories));</script>
+    
+    <script src="~/CMS/js/pageForm.js"></script>
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+}

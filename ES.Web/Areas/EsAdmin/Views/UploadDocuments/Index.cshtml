@@ -1,0 +1,170 @@
+﻿@model IEnumerable<DocumentsViewModel>
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = @Localizer["Upload documents"];
+}
+@section Styles {
+    <link href="~/CMS/assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/CMS/lib/dropzone/dropzone.min.css" rel="stylesheet">
+}
+
+
+
+<h6 class="mb-3 text-uppercase">@Localizer["Upload documents"]</h6>
+<hr />
+
+<div class="card">
+    <div class="card-body">
+        <!-- Upload Section -->
+        <div class="mb-4">
+            <form asp-controller="UploadDocuments" asp-action="Upload" class="dropzone border border-success rounded p-4 bg-light text-center" id="myDropzone">
+                <div class="dz-message">
+                    <i class="lni lni-cloud-upload display-4 text-success mb-3"></i>
+                    <p class="text-secondary">@Localizer["Drag and drop files here or click to upload"]</p>
+                </div>
+            </form>
+            <div class="col-12 text-center">
+                <button id="uploadButton" class="btn btn-success mt-3">@Localizer["Upload"]</button>
+            </div>
+        </div>
+
+
+        <!-- Documents Table -->
+        <div class="table-responsive">
+            <table id="table" class="table table-hover" style="width:100%">
+                <thead class="thead-light">
+                    <tr>
+                        <th>@Localizer["Name"]</th>
+                        <th>@Localizer["URL"]</th>
+                        <th>@Localizer["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var doc in Model)
+                    {
+                        <tr>
+                            <td>@doc.DocumentName</td>
+                            <td>
+                                <a href="@doc.DocumentURL"
+                                   target="_blank"
+                                   class="text-decoration-none"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="top"
+                                   data-bs-original-title=@Localizer["Visit"]>
+                                    @doc.DocumentURL
+                                </a>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <!-- Download Button -->
+                                    <a class="btn btn-sm btn-outline-success"
+                                       href="@doc.DocumentURL"
+                                       download
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       data-bs-original-title=@Localizer["Download"]>
+                                        <i class="lni lni-download"></i>
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            onclick="deleteDocument('@doc.Id', this)"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-bs-original-title=@Localizer["Delete"]>
+                                        <i class="lni lni-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Plugins {
+    <script src="~/CMS/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+    <script src="~/CMS/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/CMS/assets/js/table-datatable.js"></script>
+}
+
+@section Scripts {
+    <script src="~/CMS/lib/dropzone/dropzone.min.js"></script>
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script>
+            // The hover of the buttons
+            document.addEventListener('DOMContentLoaded', function () {
+            // Initialize all tooltips on the page
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    <script>
+        Dropzone.autoDiscover = false; // Prevent auto-discovery
+
+        var myDropzone = new Dropzone("#myDropzone", {
+            url: "/EsAdmin/UploadDocuments/Upload",
+            autoProcessQueue: false,  // Prevent automatic upload
+            paramName: "documents",
+            maxFilesize: 10, // Max file size in MB
+            acceptedFiles: ".pdf,.doc,.docx",
+            addRemoveLinks: true,
+            dictRemoveFile: "Remove",
+            parallelUploads: 5,  // Number of files to upload at once
+            init: function () {
+                var dropzoneInstance = this;
+
+                     // Handle upload button click
+        document.getElementById("uploadButton").addEventListener("click", function () {
+            if (dropzoneInstance.files.length === 0) {
+                Swal.fire({
+                    title: currentLanguage === 'ar-JO' ? "خطأ!" : "Error!",
+                    text: currentLanguage === 'ar-JO' ? "يرجى تحديد الملفات للرفع!" : "Please select files to upload!",
+                    icon: "warning"
+                });
+            } else {
+                dropzoneInstance.processQueue(); // Manually process the queue
+            }
+        });
+
+        // Event for successful uploads
+        dropzoneInstance.on("success", function (file, response) {
+            console.log("File uploaded successfully:", response);
+
+            Swal.fire({
+                title: currentLanguage === 'ar-JO' ? "تم الرفع!" : "Upload Successful!",
+                text: currentLanguage === 'ar-JO' ? "تم رفع الملفات بنجاح!" : "Files uploaded successfully!",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                location.reload(); // Reload the page after 2 seconds
+            });
+        });
+
+        // Event for errors
+        dropzoneInstance.on("error", function (file, errorMessage) {
+            console.error("Upload error:", errorMessage);
+
+            Swal.fire({
+                title: currentLanguage === 'ar-JO' ? "خطأ!" : "Error!",
+                text: currentLanguage === 'ar-JO' ? "حدث خطأ أثناء الرفع!" : "An error occurred during upload!",
+                icon: "error"
+            });
+        });
+        }
+                });
+    </script>
+    <script src="~/CMS/js/documentsIndex.js"></script>
+}

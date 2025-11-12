@@ -1,0 +1,207 @@
+﻿@model MenuItemViewModel
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = @Localizer["Menu Management"];
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="~/CMS/lib/nestable2/jquery.nestable.min.css" />
+}
+
+<div class="row g-4">
+    <div class="col-12">
+        
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header border-1">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="lni lni-cog me-2"></i> @Localizer["Menu Management"]
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="container-fluid">
+                    <div class="row g-4">
+                        <!-- Menu Item Form -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-success text-white rounded-top form-header">
+                                    <h5 class="mb-0">@Localizer["Add Menu Item"]</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="addMenuItemForm" target="" method="post">
+                                        <div class="mb-3">
+                                            <label for="Title" class="form-label">@Localizer["Title"] <span class="text-danger">*</span></label>
+                                            <input asp-for="Title" class="form-control" placeholder=@Localizer["Enter menu item title"] id="Title" />
+                                            <span asp-validation-for="Title" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">@Localizer["Menu Item Icon"]</label>
+                                            <select asp-for="Icon" id="IconDropdown" class="form-select">
+                                                <option value="">@Localizer["Select Icon (Optional)"]</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">@Localizer["URL Target"]</label>
+                                            <select asp-for="Target" class="form-select" id="Target">
+                                                <option value="_self">@Localizer["Self"]</option>
+                                                <option value="_blank">@Localizer["Blank"]</option>
+                                            </select>
+                                            <span asp-validation-for="Type" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label asp-for="Type" class="form-label">@Localizer["Type"]</label>
+                                            <select asp-for="Type" class="form-select" id="Type">
+                                                <option value="Category">@Localizer["Category"]</option>
+                                                <option value="Careers">@Localizer["Careers"]</option>
+                                                <option value="Page">@Localizer["Page"]</option>
+                                                <option value="ProductCategory">@Localizer["Product Category"]</option>
+                                                <option value="HomePage">@Localizer["Home page"]</option>
+                                                <option value="CustomLink">@Localizer["Another URL"]</option>
+                                                <option value="BlankLink">@Localizer["Blank link"]</option>
+
+                                            </select>
+                                            <span asp-validation-for="Type" class="text-danger"></span>
+                                        </div>
+
+                                        <div id="category-section" class="mb-3" style="display: none;">
+                                            <label class="form-label">@Localizer["Category"]</label>
+                                            <select name="CategoryDropdown" class="form-select" id="CategoryDropdown">
+                                                <option value="">@Localizer["Select Category"]</option>
+                                                @foreach (var category in Model.Categories)
+                                                {
+                                                    <option value="@category.Value" selected="@(Model.Type == "Category" && Model.URL == category.Value)">@category.Text</option>
+                                                }
+                                            </select>
+                                            <span class="text-danger" id="CategoryDropdown-validation"></span>
+                                        </div>
+
+                                        <div id="product-category-section" class="mb-3" style="display: none;">
+                                            <label class="form-label">@Localizer["Product Category"]</label>
+                                            <select name="ProductCategoryDropdown" class="form-select" id="ProductCategoryDropdown">
+                                                <option value="">@Localizer["Select Category"]</option>
+                                                @foreach (var category in Model.ProductCategories)
+                                                {
+                                                    <option value="@category.Value" selected="@(category.Value == Model.URL && Model.Type == "ProductCategory")">@category.Text</option>
+                                                }
+                                            </select>
+                                            <span class="text-danger" id="ProductCategoryDropdown-validation"></span>
+                                        </div>
+
+                                        <div id="page-section" class="mb-3" style="display: none;">
+                                            <label class="form-label">@Localizer["Page"]</label>
+                                            <select name="PagesDropdown" class="form-select" id="PagesDropdown">
+                                                <option value="">@Localizer["Select Page"]</option>
+                                                @foreach (var item in Model.Pages)
+                                                {
+                                                    <option value="@item.Value" selected="@(item.Value == Model.URL && Model.Type == "Page")">@item.Text</option>
+                                                }
+                                            </select>
+                                            <span class="text-danger" id="PagesDropdown-validation"></span>
+                                        </div>
+
+                                        <div id="custom-url-section" class="mb-3">
+                                            <label asp-for="URL" class="form-label">@Localizer["URL"]</label>
+                                            <input asp-for="URL" class="form-control" id="AnotherLink" placeholder=@Localizer["e.g., www.example.com"] />
+                                        </div>
+
+                                        <div class="mb-3 form-check">
+                                            <input asp-for="IsPublished" class="form-check-input" type="checkbox" id="PublishCheckbox" />
+                                            <label class="form-check-label" for="PublishCheckbox">@Localizer["Publish ?"]</label>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-outline-success w-100">
+                                            <i class="lni lni-plus me-2"></i> @Localizer["Add Menu Item"]
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Menu Structure -->
+                        <div class="col-md-8">
+                            <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-gradient-royal text-white rounded-top d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0 d-flex align-items-center">
+                                        <i class="lni lni-list me-2"></i> @Localizer["Menu Structure"]
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- User Notification -->
+                                    <div class="alert alert-dismissible fade show py-1 bg-warning">
+                                        <div class="d-flex align-items-center">
+                                            <div class="fs-5 text-dark">
+                                                <ion-icon name="warning-sharp" role="img" class="md hydrated" aria-label="warning sharp"></ion-icon>
+                                            </div>
+                                            <div class="ms-2">
+                                                <div class="text-dark">@Localizer["Note: If you don’t click {0}, your changes will not be saved.",Localizer["Save Order"]]</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Menu Structure -->
+                                    <div class="dd" id="nestable">
+                                        <ol class="dd-list">
+                                            @foreach (var menuItem in Model.MenuItems)
+                                            {
+                                                @Html.Partial("_MenuItem", menuItem)
+                                            }
+                                        </ol>
+                                    </div>
+
+                                    <!-- Button Group -->
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <!-- Save Button -->
+                                        <button id="saveMenuOrder" class="btn btn-success d-flex align-items-center">
+                                            <i class="lni lni-save me-2"></i> @Localizer["Save Order"]
+                                        </button>
+
+                                        <!-- Action Dropdown -->
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                @Localizer["Actions"]
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <button id="togglePublicationButton" class="dropdown-item d-flex align-items-center">
+                                                        <i class="lni lni-shuffle me-2"></i> @Localizer["Toggle Publication Status"]
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button id="deleteMenuItem" class="dropdown-item d-flex align-items-center">
+                                                        <i class="lni lni-trash me-2"></i> @Localizer["Delete"]
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Plugins {
+    <script src="~/CMS/lib/nestable2/jquery.nestable.min.js"></script>
+}
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/menuManager.js"></script>
+}

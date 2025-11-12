@@ -1,0 +1,47 @@
+﻿@model IEnumerable<PageViewModel>
+
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+<div class="col-md-12">
+    <div class="row">
+        @foreach(var item in Model)
+        {
+
+
+            <div class="col-md-4 col-sm-6 wow fadeInUp  animated" data-wow-delay=".2s" style="visibility: visible; z-index: 100; animation-name: fadeInUp; animation-delay: 0.2s;">
+                <div class="newspage ">
+                    <img alt="@item.FeaturedImageAltName" src="~/images/Pages/@item.FeaturedImageUrl" class="img-responsive">
+                    <div class="text-all">
+                        <div class="headline">
+                            @item.Title
+                        </div>
+                        <div class="title-1">
+                            @if (item.DateInput != null)
+                            {
+                                @item.DateInput.Value.ToString("dd MMM, yyyy")
+                            }
+                            else
+                            {
+                                <span>""</span>
+                            }
+                        </div>
+                        <div class="details">
+                            @item.ShortDescription
+                        </div>
+
+                        <div><a href="@item.LinkUrl" class="btn-header btn-more">@Localizer["continue reading"]</a></div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+          
+        }
+    </div>
+</div>

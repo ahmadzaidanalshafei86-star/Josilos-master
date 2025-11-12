@@ -1,0 +1,114 @@
+﻿.instructions {
+  text-align: center;
+  font-size: 20px;
+  margin: 15vh;
+}
+
+/* //////////////////////////////////////////////////////////////////////////////////////////////
+	//   Default Modal Styles   //
+////////////////////////////////////////////////////////////////////////////////////////////// */
+/*   This is the background overlay   */
+.backgroundOverlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  /*opacity: .85;*/
+  opacity:0;
+  filter: alpha(opacity=75);
+  -moz-opacity: .75;
+  z-index: 101;
+  display: none;
+}
+
+/*   This is the Popup Window   */
+.delayedPopupWindow {
+  display: none;
+  position: fixed;
+  width: auto;
+  max-width: 480px;
+  height: auto;
+  top: 50%;
+  border-radius:10px;
+  left: 50%;
+  margin-left: -260px;
+  margin-top: -180px;
+  background-color: #efefef;
+  z-index: 102;
+  padding: 10px 20px;
+}
+
+/*   This is the closing button  */
+#btnClose {
+  width: 100%;
+  display: block;
+  text-align: right;
+  text-decoration: none;
+  color: #6472b6;
+}
+
+/*   This is the closing button hover state  */
+#btnClose:hover {
+  color: #6472b6;
+}
+
+/*   This is the description headline and paragraph for the form   */
+#delayedPopup > div.formDescription {
+  display: block;
+  padding: 20px;
+  font-size: 18px;
+  color: #666;
+  text-align:center;
+}
+
+/*   This is the styling for the form's headline   */
+#delayedPopup > div.formDescription h2 {
+  color: #444444;
+  font-size: 36px;
+  line-height: 40px;
+}
+
+
+
+@media (max-width: 767px) {
+.delayedPopupWindow {
+    display: none;
+    position: fixed;
+    width: auto;
+    max-width: 80%;
+    height: auto;
+    top: 25%;
+    border-radius: 10px;
+    left: 10%;
+    margin-left: 0px;
+    margin-top: 0px;
+    background-color: #efefef;
+    z-index: 102;
+    padding: 10px 20px;
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

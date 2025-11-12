@@ -1,0 +1,58 @@
+﻿.counter-bg {
+    padding: 10px;
+    position: relative;
+    border-radius:10px;    
+    margin-top: 35px;
+    z-index: 999;
+}
+
+
+.level {
+  margin: 0 ;
+  text-align:center;
+}
+
+.level-item
+{
+    display: inline-block;
+    width: 30%;
+    position: relative;
+    padding: 10px 0;
+    margin: 15px 5px;
+}
+.level-item .icon
+{
+    margin: auto;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 15px;
+}
+
+
+.level-item .icon i
+{
+    font-size: 40px
+}
+
+
+.heading
+{
+	font-size: 16px;
+    color: #fff;
+    font-weight: 400;
+    text-transform: capitalize;
+    margin:0;
+    text-align:center;
+    padding: 10px 0px;
+}
+
+.title-counter {
+    color:  #fff;
+    font-size: 35px;
+    padding:5px 0;
+    text-align: center;
+    font-weight: 700;
+    margin:0;    
+    line-height: 35px;
+}

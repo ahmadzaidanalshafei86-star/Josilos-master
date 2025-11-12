@@ -1,0 +1,24 @@
+﻿ @model IEnumerable<PageViewModel>
+
+<div class="col-md-12">
+    <section class="second clearfix">
+        @foreach (var Page in Model)
+        {
+            if (Page.VideoUrl is not null)
+            {
+                var embedUrl = Page.VideoUrl.Contains("watch?v=")
+                ? Page.VideoUrl.Replace("watch?v=", "embed/")
+                : Page.VideoUrl;
+
+                <article class="video">
+                    <figure>
+                        <a class="fancybox fancybox.iframe" href="@embedUrl">
+                            <img class="videoThumb" src="~/images/pages/@Page.FeaturedImageUrl" alt="@Page.FeaturedImageAltName" />
+                        </a>
+                    </figure>
+                    <h6 class="videoTitle">@Page.Title</h6>
+                </article>
+            }
+        }
+    </section>
+</div>

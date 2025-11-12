@@ -1,0 +1,761 @@
+﻿@model ProductFormViewModel
+
+@using System.Globalization
+@using ES.Core.Enums
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Product"];
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/CMS/lib/dropzone/dropzone.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.1.1/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+}
+<div class="row">
+    <div class="col-xl-12 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="border p-3 rounded">
+                    <h6 class="mb-0 text-uppercase">
+                        @((Model.Id > 0)
+                            ? Localizer["Edit Product"]
+                            : Localizer["Add Product"])
+                    </h6>
+                    <hr>
+                    <form id="my-Form" method="post" enctype="multipart/form-data" asp-controller="Products">
+
+                        @Html.AntiForgeryToken()
+                        @if (Model?.Id is not null)
+                        {
+                            <input type="hidden" asp-for="Id" />
+                        }
+                        <div class="row g-3">
+
+                            <!-- Product title -->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Product title"]<span style="color: red;">*</span></label>
+                                <input asp-for="Title" class="form-control" required />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label class="form-label"> @Localizer["Category"]<span style="color: red;">*</span></label>
+                                <select id="CategoryDropdown" asp-for="CategoryIds" asp-items="Model?.Categories" multiple="multiple" class="form-select" required>
+                                </select>
+                                <span asp-validation-for="CategoryIds" class="text-danger"></span>
+                            </div>
+
+                            <!-- Brand -->
+                            <div class="col-md-6">
+                                <label class="form-label"> @Localizer["Brand"]</label>
+                                <select id="BrandsDropdown" asp-for="BrandId" asp-items="Model?.Brands" class="form-select">
+                                    <option value="" selected><-- @Localizer["Select the brand"] --></></option>
+                                </select>
+                            </div>
+
+                            <!-- Short Description -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Short description"]</label>
+                                <textarea id="tinyMCEShortDesc" asp-for="ShortDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="ShortDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Long Description -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Long description"]</label>
+                                <textarea id="tinyMCELongDesc" asp-for="LongDescription" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="LongDescription" class="text-danger"></span>
+                            </div>
+
+                            <!--Images-->
+                            <div class="row p-3">
+                                <!-- Cover Image Section -->
+                                <div class="col-md-6">
+                                    <label class="form-label">@Localizer["Cover image"]</label>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <input asp-for="CoverImage"
+                                               type="file"
+                                               class="form-control"
+                                               id="CoverImage"
+                                               accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                               data-hidden-input-id="KeepCoverImage"
+                                               onchange="previewImage(event, 'CoverImagePreview')" />
+
+                                        <!-- Clear button for input -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearCoverImage">
+                                            @Localizer["Clear"]
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <img id="CoverImagePreview"
+                                             src="@(!string.IsNullOrEmpty(Model.CoverImageUrl) ? @Url.Content($"~/images/Products/{Model.CoverImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                             alt="Cover Image"
+                                             class="img-fluid rounded shadow"
+                                             style="max-width: 100%; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                    <span asp-validation-for="CoverImage" id="coverImageError" class="text-danger" style="margin-top: 8px; display: block;"></span>
+                                    <input type="hidden" asp-for="CoverImageUrl" value="@Model.CoverImageUrl" />
+
+                                    <!-- Hidden input to track whether to keep the image -->
+                                    <input type="hidden" id="KeepCoverImage" asp-for="@Model.KeepCoverImage" value="true" />
+                                </div>
+
+                                <!-- Featured Image Section -->
+                                <div class="col-md-6">
+                                    <label class="form-label">@Localizer["Featured image"]</label>
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <input asp-for="FeaturedImage"
+                                               type="file"
+                                               class="form-control"
+                                               id="FeaturedImage"
+                                               accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                               data-hidden-input-id="KeepFeaturedImage"
+                                               onchange="previewImage(event, 'FeaturedImagePreview')" />
+
+                                        <!-- Clear button for input -->
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearFeaturedImage">
+                                            @Localizer["Clear"]
+                                        </button>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <img id="FeaturedImagePreview"
+                                             src="@(!string.IsNullOrEmpty(Model.FeaturedImageUrl) ? @Url.Content($"~/images/Products/{Model.FeaturedImageUrl}") : Url.Content("~/images/placeholder.png"))"
+                                             alt="Featured Image"
+                                             class="img-fluid rounded shadow"
+                                             style="max-width: 100%; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                    <span asp-validation-for="FeaturedImage" id="featuredImageError" class="text-danger" style="margin-top: 8px; display: block;"></span>
+
+                                    <input type="hidden" asp-for="FeaturedImageUrl" value="@Model.FeaturedImageUrl" />
+
+                                    <!-- Hidden input to track whether to keep the image -->
+                                    <input asp-for="@Model.KeepFeaturedImage" type="hidden" id="KeepFeaturedImage" value="true" />
+                                </div>
+                            </div>
+
+                            <!-- Video URL -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Video URL"]</label>
+                                <input type="text" asp-for="VideoUrl" class="form-control" oninput="updateVideoPreview(this.value)" />
+                                <span asp-validation-for="VideoUrl" class="text-danger"></span>
+                            </div>
+
+                            <!-- Video Preview -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Video Preview"]</label>
+                                <div class="ratio ratio-16x9">
+                                    <iframe id="videoPreview" src="" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Meta Description -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Description"]</label>
+                                <textarea asp-for="MetaDescription" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaDescription" class="text-danger"></span>
+                            </div>
+
+                            <!-- Meta Keywords -->
+                            <div class="col-md-6">
+                                <label class="form-label">@Localizer["Meta Keywords"]</label>
+                                <textarea asp-for="MetaKeywords" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="MetaKeywords" class="text-danger"></span>
+                            </div>
+
+                            <!--Gallery Images-->
+                            <div class="col-md-12">
+                                <label class="form-label">@Localizer["Gallery images"]</label>
+                                <div id="myDropzone" class="dropzone">
+                                    <div id="sortablePreviews"></div>
+                                </div>
+                            </div>
+
+                            <!-- Product Data Section -->
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">@Localizer["Product Data"]</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Product Type Selection -->
+                                        <div class="mb-3">
+                                            <label class="form-label">@Localizer["Product Type"]</label>
+                                            <select asp-for="ProductType" class="form-select" id="ProductType">
+                                                <option value="simple">Simple</option>
+                                                <option value="variable">Variable</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Tabs for Product Data -->
+                                        <ul class="nav nav-tabs" id="productDataTabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-bs-toggle="tab" href="#pricingTab">
+                                                    <i class="lni lni-money-protection"></i> @Localizer["Pricing"]
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#inventoryTab">
+                                                    <i class="lni lni-database"></i> @Localizer["Inventory"]
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#linkedProductsTab">
+                                                    <i class="lni lni-link"></i> @Localizer["Linked Products"]
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#tabsTab">
+                                                    <i class="lni lni-list"></i> Tabs
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#attributesTab">
+                                                    <i class="lni lni-cog"></i> @Localizer["Attributes"]
+                                                </a>
+                                            </li>
+
+                                        </ul>
+
+                                        <div class="tab-content mt-3">
+                                            <!-- Pricing Tab -->
+                                            <div class="tab-pane fade show active" id="pricingTab">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">@Localizer["Regular Price"]</label>
+                                                        <input asp-for="RegularPrice" class="form-control" type="number" step="0.01" id="RegularPrice" />
+                                                        <span asp-validation-for="RegularPrice" class="text-danger" id="regularPriceError"></span>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">@Localizer["Sale Price"]</label>
+                                                        <input asp-for="SalePrice" class="form-control" type="number" step="0.01" id="SalePrice" />
+                                                        <span asp-validation-for="SalePrice" class="text-danger fw-bold small d-block mt-1" id="salePriceError"></span>
+
+                                                    </div>
+
+                                                    <!-- Sale Schedule Button with Offer Icon -->
+                                                    <div class="col-md-12">
+                                                        <button type="button" class="btn btn-outline-primary" id="toggleSchedule">
+                                                            <i class="lni lni-offer"></i> @Localizer["Sale Schedule (Optional)"]
+                                                        </button>
+                                                    </div>
+
+
+                                                    <!-- Sale Schedule Fields -->
+                                                    <div id="saleScheduleFields" class="row g-3" style="display: none;">
+                                                        <div class="col-md-6">
+                                                            <div class="form-floating mb-3">
+                                                                <input asp-for="SaleStartDate" type="datetime" class="form-control sale-start-date" placeholder="@Localizer["Select sale start date"]">
+                                                                <label for="datepicker1">@Localizer["Sale Start Date"]</label>
+                                                                <span class="input-group-text position-absolute end-0 top-50 translate-middle-y me-3">
+                                                                    <i class="lni lni-calendar"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="form-floating mb-3">
+                                                                <input asp-for="SaleEndDate" type="datetime" class="form-control sale-end-date" placeholder="@Localizer["Select sale end date"]">
+                                                                <label for="datepicker2">@Localizer["Sale End Date"]</label>
+                                                                <span class="input-group-text position-absolute end-0 top-50 translate-middle-y me-3">
+                                                                    <i class="lni lni-calendar"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Inventory Tab -->
+                                            <div class="tab-pane fade" id="inventoryTab">
+
+                                                <!-- Section 1: Product Identification -->
+                                                <h6 class="fw-bold">@Localizer["Product Identification"]</h6>
+                                                <!-- SKU & GTIN (Section 1) -->
+                                                <div class="border-bottom pb-3 mb-3">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label" data-bs-toggle="tooltip" title="A unique identifier for the product.">@Localizer["SKU"]</label>
+                                                            <input asp-for="SKU" class="form-control" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label" data-bs-toggle="tooltip" title="Global Trade Item Number for barcode scanning.">@Localizer["GTIN (Optional)"]</label>
+                                                            <input asp-for="GTIN" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- Section 2: Stock Management -->
+                                                <h6 class="fw-bold">@Localizer["Stock Management"]</h6>
+                                                <div class="border-bottom pb-3 mb-3">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-12 d-flex align-items-center">
+                                                            <input type="checkbox" asp-for="ManageStock" id="manageStockCheckbox" class="form-check-input me-2" />
+                                                            <label for="manageStockCheckbox" class="form-label mb-0" data-bs-toggle="tooltip" title="Enable this to manage stock levels manually.">@Localizer["Enable Stock Management"]</label>
+                                                        </div>
+
+                                                        <!-- Stock Quantity, Low Stock Threshold, Allow Backorders -->
+                                                        <div id="stockManagementFields" style="display: none;">
+                                                            <div class="row g-3">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label" data-bs-toggle="tooltip" title="Total available stock.">@Localizer["Stock Quantity"]</label>
+                                                                    <input asp-for="Quantity" class="form-control" type="number" min="0" />
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label" data-bs-toggle="tooltip" title="Send a notification when stock reaches this number.">@Localizer["Low Stock Threshold"]</label>
+                                                                    <input asp-for="LowStockThreshold" class="form-control" type="number" min="0" />
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label" data-bs-toggle="tooltip" title="Decide whether customers can order out-of-stock products.">
+                                                                        @Localizer["Allow Backorders?"]
+                                                                    </label>
+                                                                    <select asp-for="AllowBackorders" class="form-select" asp-items="Html.GetEnumSelectList<BackorderStatus>()">
+                                                                        <option value="">@Localizer["Select an option"]</option>
+                                                                    </select>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Stock Status (If Stock Management is Disabled) -->
+                                                        <div id="stockStatusField" style="display: none;">
+                                                            <div class="col-md-6">
+                                                                <label class="form-label" data-bs-toggle="tooltip" title="Set the stock availability when stock management is disabled.">@Localizer["Stock Status"]</label>
+                                                                <select asp-for="StockStatus" class="form-select">
+                                                                    <option value="in_stock">@Localizer["In Stock"]</option>
+                                                                    <option value="out_of_stock">@Localizer["Out of Stock"]</option>
+                                                                    <option value="on_backorder">@Localizer["On Backorder"]</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Section 3: Selling Rules -->
+                                                <h6 class="fw-bold">@Localizer["Selling Rules"]</h6>
+                                                <div class="row g-3">
+                                                    <!-- Sold Individually -->
+                                                    <div class="col-md-6 d-flex align-items-center">
+                                                        <input type="checkbox" asp-for="SoldIndividually" id="soldIndividuallyCheckbox" class="form-check-input me-2" />
+                                                        <label for="soldIndividuallyCheckbox" class="form-label mb-0" data-bs-toggle="tooltip" title="Allow only one unit per order.">@Localizer["Sold Individually"]</label>
+                                                    </div>
+                                                    <!-- Exclude from Sold Out Badge -->
+                                                    <div class="col-md-6 d-flex align-items-center">
+                                                        <input type="checkbox" asp-for="ExcludeFromSoldOutBadge" id="excludeSoldOutCheckbox" class="form-check-input me-2" />
+                                                        <label for="excludeSoldOutCheckbox" class="form-label mb-0" data-bs-toggle="tooltip" title="Exclude this product from being marked as Sold Out.">@Localizer["Exclude from Sold Out Badge"]</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Linked Products Tab -->
+                                            <div class="tab-pane fade" id="linkedProductsTab">
+                                                <!-- Section Header -->
+                                                <h6 class="fw-bold mb-3">
+                                                    <i class="lni lni-link"></i> @Localizer["Manage Linked Products"]
+                                                </h6>
+
+                                                <!-- Category Filter -->
+                                                <label class="form-label">
+                                                    <i class="lni lni-funnel"></i> @Localizer["Filter by Category"]
+                                                </label>
+                                                <select id="categoryFilterDropdown" class="form-select">
+                                                    <option value="">@Localizer["All Categories"]</option>
+                                                    @foreach (var category in Model.Categories)
+                                                    {
+                                                        <option value="@category.Value">@category.Text</option>
+                                                    }
+                                                </select>
+                                                <small class="text-muted">@Localizer["Select a category to filter available products."]</small>
+
+                                                <hr>
+
+                                                <!-- Select Products Button -->
+                                                <button type="button" class="btn btn-primary mt-2 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#linkedProductsModal">
+                                                    <i class="lni lni-cart me-2"></i> @Localizer["Select Products"]
+                                                </button>
+
+                                                <!-- Selected Products List -->
+                                                <h6 class="mt-3">@Localizer["Selected Products"]</h6>
+
+                                                <ul id="selectedProductsList" class="list-group list-group-flush">
+                                                    @foreach (var product in Model.AvailableProducts.Where(p => Model.LinkedProductIds.Contains(int.Parse(p.Value))))
+                                                    {
+                                                        <li class="list-group-item d-flex justify-content-between align-items-center" data-product-id="@product.Value">
+                                                            <span><i class="bx bx-cube md hydrated"></i> @product.Text</span>
+                                                            <button type="button" class="btn btn-danger btn-sm remove-product">
+                                                                <i class="lni lni-close"></i>
+                                                            </button>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+
+                                            <!-- Tabs Section -->
+                                            <div class="tab-pane fade" id="tabsTab">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="fw-bold">Product Tabs</h6>
+                                                    <button type="button" class="btn btn-outline-success btn-sm" id="addTabBtn">
+                                                        <i class="lni lni-plus"></i> @Localizer["Add New Tab"]
+                                                    </button>
+                                                </div>
+
+                                                <!-- Publish/Unpublish Checkboxes -->
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="form-check m-0">
+                                                                <input class="form-check-input" type="checkbox" asp-for="DescriptionTab" id="descriptionTabCheckbox">
+                                                                <label class="form-check-label fw-medium" for="descriptionTabCheckbox">
+                                                                    @Localizer["Publish Description Tab"]
+                                                                </label>
+                                                            </div>
+                                                            <i class="lni lni-question-circle ms-2 text-muted tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                               title="@Localizer["Enable this to show the Description Tab on the product page."]"></i>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="form-check m-0">
+                                                                <input class="form-check-input" type="checkbox" asp-for="ReviewTab" id="reviewTabCheckbox">
+                                                                <label class="form-check-label fw-medium" for="reviewTabCheckbox">
+                                                                    @Localizer["Publish Review Tab"]
+                                                                </label>
+                                                            </div>
+                                                            <i class="lni lni-question-circle ms-2 text-muted tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                               title="@Localizer["Enable this to show the Review Tab on the product page."]"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="productTabsContainer">
+                                                    @for (int i = 0; i < Model.ProductTabs.Count; i++)
+                                                    {
+                                                        <div class="card shadow-sm border-0 rounded-3 mb-3 tab-item">
+                                                            <div class="card-body position-relative">
+                                                                <button type="button" class="btn-close remove-tab position-absolute top-0 end-0 m-2"></button>
+
+                                                                <div class="row g-2 mb-3">
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-medium">Tab Title</label>
+                                                                        <input type="text" class="form-control" asp-for="ProductTabs[i].Title" maxlength="40" required />
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-medium">Tab Order</label>
+                                                                        <input type="number" class="form-control" asp-for="ProductTabs[i].Order" min="1" />
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-medium">Tab Content</label>
+                                                                    <textarea class="form-control tinyMCE" id="tinyMCE_@i" asp-for="ProductTabs[i].Content" rows="5"></textarea>
+                                                                </div>
+
+                                                                <input type="hidden" asp-for="ProductTabs[i].Id" />
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <!-- Attributes Tab Content -->
+                                            <div class="tab-pane fade" id="attributesTab">
+                                                <div class="row">
+                                                    <!-- Attribute Selection Dropdown -->
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">@Localizer["Select Attributes"]</label>
+                                                        <select id="attributeDropdown" class="form-select">
+                                                            <option value="">@Localizer["Choose an attribute"]</option>
+                                                            @foreach (var attribut in Model.AvailableAttributes)
+                                                            {
+                                                                <option value="@attribut.Id">@attribut.Name</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Selected Attributes Container -->
+                                                    <div id="selectedAttributesContainer" class="col-md-12 mt-3">
+                                                        @for (int i = 0; i < Model.AvailableAttributes.Count; i++)
+                                                        {
+                                                            var attribut = Model.AvailableAttributes[i];
+                                                            <div id="attribute_@attribut.Id" class="card shadow-sm mb-3 d-none">
+                                                                <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                                                                    <h6 class="mb-0 text-primary fw-bold">
+                                                                        <i class="lni lni-sliders"></i> @attribut.Name
+                                                                    </h6>
+                                                                    <button type="button" class="btn btn-sm btn-danger remove-attribute" data-attr-id="@attribut.Id">
+                                                                        <i class="lni lni-trash"></i> @Localizer["Remove"]
+                                                                    </button>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <input type="hidden" name="SelectedAttributes[@i].AttributeId" value="@attribut.Id" />
+
+                                                                    <div class="accordion" id="attributeAccordion_@attribut.Id">
+                                                                        @for (int j = 0; j < attribut.Values.Count; j++)
+                                                                        {
+                                                                            var value = attribut.Values[j];
+                                                                            <div class="accordion-item">
+                                                                                <!-- Value Selection -->
+                                                                                <h2 class="accordion-header" id="heading_@value.Id">
+                                                                                    <div class="d-flex align-items-center p-2">
+                                                                                        <input type = "hidden" asp-for="SelectedAttributes[i].Values[j].ValueId" />
+                                                                                        <input type = "hidden" asp-for="SelectedAttributes[i].Values[j].ValueName" />
+
+                                                                                        <input type="checkbox" asp-for="SelectedAttributes[i].Values[j].IsSelected"
+                                                                                               class="form-check-input me-2" />
+                                                                                                
+                                                                                        <label asp-for="SelectedAttributes[i].Values[j].IsSelected" class="form-check-label fs-6 fw-bold text-dark">
+                                                                                            <i class="lni lni-tag"></i> @value.Value
+                                                                                        </label>
+
+                                                                                        <button class="btn btn-sm btn-primary ms-auto" type="button"
+                                                                                                data-bs-toggle="collapse" data-bs-target="#collapse_@value.Id"
+                                                                                                aria-expanded="true" aria-controls="collapse_@value.Id">
+                                                                                            <i class="lni lni-chevron-down"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </h2>
+
+                                                                                <!-- Collapsible Content -->
+                                                                                <div id="collapse_@value.Id" class="accordion-collapse collapse"
+                                                                                     aria-labelledby="heading_@value.Id" data-bs-parent="#attributeAccordion_@attribut.Id">
+                                                                                    <div class="accordion-body">
+                                                                                        <div class="row g-3">
+                                                                                            <!-- Regular Price -->
+                                                                                            <div class="col-md-6">
+                                                                                                <label class="form-label">@Localizer["Regular Price"]</label>
+                                                                                                <input type="number" asp-for="SelectedAttributes[@i].Values[@j].RegualrPrice"
+                                                                                                       class="form-control" step="0.01" placeholder="@Localizer["Regular Price"]">
+                                                                                            </div>
+
+                                                                                            <!-- Sale Price -->
+                                                                                            <div class="col-md-6">
+                                                                                                <label class="form-label">@Localizer["Sale Price"]</label>
+                                                                                                <input type="number" asp-for="SelectedAttributes[@i].Values[@j].SalePrice"
+                                                                                                       class="form-control" step="0.01" placeholder="@Localizer["Sale Price"]">
+                                                                                            </div>
+
+                                                                                            <!-- Sale Schedule Button -->
+                                                                                            <div class="col-md-12">
+                                                                                                <button type="button" class="btn btn-outline-primary toggleSchedule"
+                                                                                                        data-target="#saleScheduleFields_@value.Id">
+                                                                                                    <i class="lni lni-offer"></i> @Localizer["Sale Schedule (Optional)"]
+                                                                                                </button>
+
+                                                                                            </div>
+
+                                                                                            <!-- Sale Schedule Fields -->
+                                                                                            <div id="saleScheduleFields_@value.Id" class="row g-3" style="display: none;">
+                                                                                                <div class="col-md-6">
+                                                                                                    <div class="form-floating mb-3">
+                                                                                                        <input type="datetime" asp-for="SelectedAttributes[@i].Values[@j].SaleStartDate"
+                                                                                                               class="form-control sale-start-date"
+                                                                                                               placeholder="@Localizer["Select sale start date"]">
+                                                                                                        <label for="datepicker_start_@value.Id">@Localizer["Sale Start Date"]</label>
+                                                                                                        <span class="input-group-text position-absolute end-0 top-50 translate-middle-y me-3">
+                                                                                                            <i class="lni lni-calendar"></i>
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                <div class="col-md-6">
+                                                                                                    <div class="form-floating mb-3">
+                                                                                                        <input type="datetime" asp-for="SelectedAttributes[@i].Values[@j].SaleEndDate"
+                                                                                                              class="form-control sale-end-date"
+                                                                                                               placeholder="@Localizer["Select sale end date"]">
+                                                                                                        <label for="datepicker_end_@value.Id">@Localizer["Sale End Date"]</label>
+                                                                                                        <span class="input-group-text position-absolute end-0 top-50 translate-middle-y me-3">
+                                                                                                            <i class="lni lni-calendar"></i>
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <!-- SKU & Stock Quantity -->
+                                                                                            <div class="col-md-6 mt-2">
+                                                                                                <label class="form-label">@Localizer["SKU"]</label>
+                                                                                                <input type="text" asp-for="SelectedAttributes[@i].Values[@j].SKU"
+                                                                                                       class="form-control" placeholder="@Localizer["SKU"]">
+                                                                                            </div>
+                                                                                            <div class="col-md-6 mt-2">
+                                                                                                <label class="form-label">@Localizer["Stock Quantity"]</label>
+                                                                                                <input type="number" asp-for="SelectedAttributes[@i].Values[@j].StockQuantity"
+                                                                                                       class="form-control" placeholder="@Localizer["Stock Quantity"]">
+                                                                                            </div>
+
+                                                                                            <!-- Image Upload -->
+                                                                                            <div class="col-md-12 mt-2">
+                                                                                                <label class="form-label">@Localizer["Image"]</label>
+                                                                                                <div class="d-flex align-items-center">
+                                                                                                    <input type="file" name="SelectedAttributes[@i].Values[@j].Image"
+                                                                                                           class="form-control"
+                                                                                                           id="attributeImage_@value.Id"
+                                                                                                           accept="image/jpeg, image/jpg ,image/png, image/webp"
+                                                                                                           data-hidden-input-id="KeepImage_@value.Id"
+                                                                                                           onchange="previewImage(event, 'attributeImagePreview_@value.Id')">
+
+                                                                                                    <!-- Clear button for input -->
+                                                                                                    <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="clearAttributeImage_@value.Id">
+                                                                                                        @Localizer["Clear"]
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                                <div class="d-flex justify-content-center mt-2">
+                                                                                                    <img id="attributeImagePreview_@value.Id"
+                                                                                                         src="@(string.IsNullOrEmpty(@Model.SelectedAttributes[@i].Values[@j].ImageUrl) ? Url.Content("~/images/placeholder.png") : Url.Content($"~/images/Products/{@Model.SelectedAttributes[@i].Values[@j].ImageUrl}"))"
+                                                                                                         alt="Attribute Image"
+                                                                                                         class="img-fluid rounded shadow"
+                                                                                                         style="max-width: 100%; max-height: 200px; object-fit: cover;">
+                                                                                                </div>
+                                                                                                <span id="attributeImageError_@value.Id" class="text-danger" style="margin-top: 8px; display: block;"></span>
+                                                                                                <input type="hidden" name="SelectedAttributes[@i].Values[@j].ImageUrl" value="@Model.SelectedAttributes[@i].Values[@j].ImageUrl" />
+                                                                                                <input type="hidden" id="KeepImage_@value.Id" name="SelectedAttributes[@i].Values[@j].KeepImage" value="true" />
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Is Published -->
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input asp-for="IsPublished" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">@Localizer["Publish ?"]</label>
+                                </div>
+                                <span asp-validation-for="IsPublished" class="text-danger"></span>
+                            </div>
+
+                            <!-- Labels -->
+                            <div class="col-md-6">
+                                <label class="form-label"> @Localizer["Labels"]</label>
+                                <select id="LabelsDropdown" asp-for="LabelId" asp-items="Model?.Labels" class="form-select">
+                                    <option value="">@Localizer["None"]</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">@Localizer["Submit"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Selecting Products -->
+<div class="modal fade" id="linkedProductsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">@Localizer["Select Linked Products"]</h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Search Bar -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="lni lni-search"></i></span>
+                    <input type="text" id="productSearch" class="form-control" placeholder="@Localizer["Search products..."]">
+                </div>
+                <!-- Product Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">@Localizer["Select"]</th>
+                                <th>@Localizer["Product Name"]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productList">
+                            @foreach (var product in Model.AvailableProducts)
+                            {
+                                <tr data-category="@product.Value">
+                                    <td>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input product-checkbox" value="@product.Value" data-product-name="@product.Text" id="chk-@product.Value">
+                                            <label class="form-check-label" for="chk-@product.Value"></label>
+                                        </div>
+                                    </td>
+                                    <td>@product.Text</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="lni lni-close"></i> @Localizer["Close"]
+                </button>
+                <button type="button" class="btn btn-primary" id="saveLinkedProducts">
+                    <i class="lni lni-save"></i> @Localizer["Save"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    var existingGalleryImages = Model.ExistingGalleryImages;
+}
+
+@section Plugins {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/CMS/js/tinyMce.js"></script>
+    <script src="~/CMS/lib/dropzone/dropzone.min.js"></script>
+    <script src="~/CMS/lib/sortable/sortable.min.js"></script>
+
+    <script>
+        var existingGalleryImages = @Html.Raw(Json.Serialize(existingGalleryImages));
+        var selectedProducts = @Html.Raw(Json.Serialize(Model.LinkedProductIds));
+    </script>
+
+    <script src="~/CMS/js/ProductForm.js"></script>
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the language, e.g., "en-US" or "ar"
+
+        var translations = {
+            "en-US": {
+                "Tab Title": "Tab Title",
+                "Tab Order": "Tab Order",
+                "Tab Content": "Tab Content"
+            },
+            "ar-JO": {
+                "Tab Title": "عنوان ال Tab",
+                "Tab Order": "ترتيب ال Tab",
+                "Tab Content": "محتوى ال Tab"
+            }
+        };
+
+        function getTranslation(key) {
+            return translations[currentLanguage] ? translations[currentLanguage][key] : key;
+        }
+    </script>
+
+}

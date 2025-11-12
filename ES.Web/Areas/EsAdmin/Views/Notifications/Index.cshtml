@@ -1,0 +1,63 @@
+﻿@model Notification
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Globalization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = Localizer["Notification Settings"];
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm p-4">
+            <h2 class="mb-4 d-flex align-items-center">
+                <i class="lni lni-envelope me-2"></i> @Localizer["Notification Settings"]
+            </h2>
+
+            <form asp-action="Index" method="post">
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label" for="email-input">@Localizer["Email"]</label>
+                    <input asp-for="Email" class="form-control" id="email-input" placeholder="@Localizer["e.g. name@domain.com"]"
+                           type="email" required />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="WhatsAppNumber" class="form-label" for="whatsapp-input">@Localizer["WhatsApp Number"]</label>
+                    <input asp-for="WhatsAppNumber" class="form-control" id="whatsapp-input" placeholder="@Localizer["e.g. +12345678900"]"
+                           type="tel" required pattern="^\+[1-9]\d{9,14}$" inputmode="numeric" onkeypress="return (event.charCode !=8 && event.charCode == 43) || (event.charCode >= 48 && event.charCode <= 57)" />
+                    <span asp-validation-for="WhatsAppNumber" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                    <i class="lni lni-save me-2"></i> @Localizer["Save Changes"]
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            var successMessage = '@TempData["Success"]';
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName';
+
+            if (successMessage) {
+                Swal.fire({
+                    icon: 'success',
+                    title: currentCulture === 'ar' ? 'تم الحفظ' : 'Saved',
+                    text: successMessage,
+                    confirmButtonText: currentCulture === 'ar' ? 'موافق' : 'OK',
+                    customClass: {
+                        confirmButton: 'btn btn-primary'
+                    },
+                    buttonsStyling: false
+                });
+            }
+        });
+    </script>
+}

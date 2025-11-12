@@ -1,0 +1,92 @@
+﻿@model FormTranslatesViewModel
+
+@using System.Globalization
+@using ES.Web.Areas.EsAdmin.Models
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewData["Title"] = @Localizer["Form translates"];
+}
+
+@section Styles {
+    <link href="~/CMS/css/translationindex.css" rel="stylesheet" />
+}
+
+<div id="translations-section" class="container py-4">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h5 class="fw-bold d-flex align-items-center">
+            <img src="~/CMS/assets/images/icons/translate.png" alt="Translations Icon" class="me-2 img-fluid" style="width: 32px; height: auto; max-width: 100%;">
+            @Localizer["Form Translates"]
+        </h5>
+        <!-- 1 refers to number of available languages more than English -->
+        @if (Model.PreEnteredTranslations.Count() < 1)
+        {
+            <a asp-action="Create" asp-route-formId="@Model.FormId" class="btn btn-success d-flex align-items-center">
+                <i class="lni lni-plus me-2" style="font-size: 1.2rem;"></i>
+                @Localizer["Add Translation"]
+            </a>
+        }
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle custom-table">
+            <thead>
+                <tr>
+                    <th>@Localizer["Title"]</th>
+                    <th>@Localizer["Language"]</th>
+                    <th>@Localizer["Creation Date"]</th>
+                    <th>@Localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold">@Model.FormTitle</td>
+                    <td class="text-muted">@Localizer[Model.FormDefaultLang!] / @Localizer["default language"]</td>
+                    <td>@Model.CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <a asp-controller="Forms" asp-action="Edit" asp-route-id="@Model.FormId" class="me-2" title="@Localizer["Edit"]">
+                            <ion-icon class="lni lni-pencil hover-scale text-primary"></ion-icon>
+                        </a>
+                        <a asp-controller="Forms" asp-action="Edit" asp-route-id="@Model.FormId" class="me-2" title="@Localizer["View Translation"]">
+                            <ion-icon class="lni lni-eye hover-scale text-success" style="background: none;"></ion-icon>
+                        </a>
+                    </td>
+                </tr>
+                @if (Model.PreEnteredTranslations is not null)
+                {
+                    @foreach (var translate in Model.PreEnteredTranslations)
+                    {
+                        <tr>
+                            <td class="fw-bold">@translate.TranslatedTitle</td>
+                            <td class="text-muted">@Localizer[translate.Language.Code]</td>
+                            <td>@translate.CreatedAt.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a asp-controller="FormsTranslates" asp-action="Edit" asp-route-formId="@Model.FormId" asp-route-translationId="@translate.Id" class="me-2" title="@Localizer["Edit"]">
+                                    <ion-icon class="lni lni-pencil hover-scale text-primary"></ion-icon>
+                                </a>
+                                <a asp-controller="FormsTranslates" asp-action="Edit" asp-route-formId="@Model.FormId" asp-route-translationId="@translate.Id" class="me-2" title="@Localizer["View Translation"]">
+                                    <ion-icon class="lni lni-eye hover-scale text-success"></ion-icon>
+                                </a>
+                                <a href="javascript:;" onclick="deleteTranslation('@translate.Id', this)" class="me-2" title="@Localizer["Delete"]">
+                                    <ion-icon class="lni lni-trash hover-scale text-danger"></ion-icon>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var currentLanguage = '@CultureInfo.CurrentCulture.Name'; // This will set the current language, e.g., "en-US" or "ar"
+    </script>
+    <script src="~/CMS/js/formTranslates.js"></script> 
+}
+
+
+
